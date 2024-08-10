@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Satisfy&display=swap');
+.footer {
+    position: absolute;
+    bottom: -1000px;
+    left: 0;
+    right: 0;
+    background-color: #587195;
+    color: #1a2433;
+    text-align: center;
+    padding: 10px 0;
+    font-family: 'Roboto Slab', sans-serif;
+}

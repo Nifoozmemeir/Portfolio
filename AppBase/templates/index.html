@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/containers.css' %}">
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+</head>
+<body>
+    <!-----Nav bar----->
+    <header>
+        <a href="{% url 'WelcomeIndex' %}" class="logo">
+            <img src="{% static 'img/jers3.png' %}" alt="Logo">
+        </a>        
+        <ul>
+            <li><a href="{% url 'Index' %}">Home</a></li>
+            <li><a href="{% url 'AboutMe' %}">About Me</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </header>
+    <section class="banner"></section>
+    <script type="text/javascript">
+        window.addEventListener("scroll", function(){
+            var header = document.querySelector("header");
+            header.classList.toggle("sticky", window.scrollY > 0)
+        })
+    </script>
+    {% block changeContent %}
+    <!-----Sliders----->
+    <div class="title1">
+        <h1>Game Developer Projects</h1>
+    </div>
+    <!-----Slider 1----->
+    <div class="top-text1">
+        <h1>Space Commander SEU</h1>
+    </div>
+    <div class="slidershow2 middle2">
+        <div class="slides2">
+            <input type="radio" name="r2" id="r21" checked>
+            <input type="radio" name="r2" id="r22">
+            <input type="radio" name="r2" id="r23">
+            <input type="radio" name="r2" id="r24">
+            <input type="radio" name="r2" id="r25">
+            <div class="slide2 s2">
+                <img src="{% static 'img/SpaceCommander1.gif' %}" alt="SpaceCommanderGif1">
+            </div>
+            <div class="slide2">
+                <img src="{% static 'img/SpaceCommander2.gif' %}" alt="SpaceCommanderGif2">
+            </div>
+            <div class="slide2">
+                <img src="{% static 'img/SpaceCommander3.gif' %}" alt="SpaceCommanderGif3">
+            </div>
+            <div class="slide2">
+                <img src="{% static 'img/SpaceCommander4.gif' %}" alt="SpaceCommanderGif4">
+            </div>
+            <div class="slide2">
+                <img src="{% static 'img/SpaceCommander5.gif' %}" alt="SpaceCommanderGif5">
+            </div>
+        </div>
+        <div class="navigation2">
+            <label for="r21" class="bar2"></label>
+            <label for="r22" class="bar2"></label>
+            <label for="r23" class="bar2"></label>
+            <label for="r24" class="bar2"></label>
+            <label for="r25" class="bar2"></label>
+        </div>
+    </div>
+    <div class="bottom-text1">
+        <a href="{% url 'SpaceCommanderSEU' %}">More about this project!</a>
+    </div>
+    <!-----Slider 2----->
+    <div class="top-text2">
+        <h1>Gems Crawler</h1>
+    </div>
+    <div class="slidershow middle">
+        <div class="slides">
+            <input type="radio" name="r" id="r1" checked>
+            <input type="radio" name="r" id="r2">
+            <input type="radio" name="r" id="r3">
+            <input type="radio" name="r" id="r4">
+            <input type="radio" name="r" id="r5">
+            <div class="slide s1">
+                <img src="{% static 'img/GemsCrawler1.gif' %}" alt="GemsCrawlerGif1">
+            </div>
+            <div class="slide">
+                <img src="{% static 'img/GemsCrawler2.gif' %}" alt="GemsCrawlerGif2">
+            </div>
+            <div class="slide">
+                <img src="{% static 'img/GemsCrawler3.gif' %}" alt="GemsCrawlerGif3">
+            </div>
+            <div class="slide">
+                <img src="{% static 'img/GemsCrawler4.gif' %}" alt="GemsCrawlerGif4">
+            </div>
+            <div class="slide">
+                <img src="{% static 'img/GemsCrawler5.gif' %}" alt="GemsCrawlerGif5">
+            </div>
+        </div>
+        <div class="navigation">
+            <label for="r1" class="bar"></label>
+            <label for="r2" class="bar"></label>
+            <label for="r3" class="bar"></label>
+            <label for="r4" class="bar"></label>
+            <label for="r5" class="bar"></label>
+        </div>
+    </div>
+    <div class="bottom-text2">
+        <a href="{% url 'GemsCrawler' %}">More about this project!</a>
+    </div>
+    <div class="title2">
+        <h1>Web Developer Projects</h1>
+    </div>
+    <!-----Slider 3----->
+    <div class="top-text3">
+        <h1>Website Project Python/Django</h1>
+    </div>
+    <div class="slidershow3 middle3">
+        <div class="slides3">
+            <input type="radio" name="r3" id="r31" checked>
+            <input type="radio" name="r3" id="r32">
+            <input type="radio" name="r3" id="r33">
+            <input type="radio" name="r3" id="r34">
+            <input type="radio" name="r3" id="r35">
+            <div class="slide3 s3">
+                <img src="{% static 'img/PagWeb1.gif' %}" alt="PagWebGif1">
+            </div>
+            <div class="slide3">
+                <img src="{% static 'img/PagWeb2.gif' %}" alt="PagWebGif2">
+            </div>
+            <div class="slide3">
+                <img src="{% static 'img/PagWeb3.gif' %}" alt="PagWebGif3">
+            </div>
+            <div class="slide3">
+                <img src="{% static 'img/PagWeb4.gif' %}" alt="PagWebGif4">
+            </div>
+            <div class="slide3">
+                <img src="{% static 'img/PagWeb5.gif' %}" alt="PagWebGif5">
+            </div>
+        </div>
+        <div class="navigation3">
+            <label for="r31" class="bar3"></label>
+            <label for="r32" class="bar3"></label>
+            <label for="r33" class="bar3"></label>
+            <label for="r34" class="bar3"></label>
+            <label for="r35" class="bar3"></label>
+        </div>
+    </div>
+    <div class="bottom-text3">
+        <a href="{% url 'FinalProject' %}">More about this project!</a>
+    </div>
+    <!-----Contact----->
+    <section class="contact" id="contact">
+        <h1>Contact:</h1>
+        <p>If you are interested in hiring me or in my projects and want to get in touch, you can do it here:</p>
+        <p>Email: julian.ers@hotmail.com</p>
+        <p>Discord: nifoozmemeir</p>
+        <img src="{% static 'img/QRtiger.png' %}" alt="QR Code to Linktree">
+    </section>
+    {% endblock %}
+    <!-----Footer----->
+    <footer class="footer">
+        <p>This website was made by Julian Rosas Sandillú using Python 3.12.3 and Django 5.0.4. Rosario, Argentina 2024.</p>
+    </footer>
+</body>
+</html>

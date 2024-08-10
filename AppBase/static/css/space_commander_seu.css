@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Satisfy&display=swap');
+#changeContent 
+{
+    text-align: center;
+    font-family: 'Roboto Slab', sans-serif;
+}
+#changeContent h1 
+{
+    position: absolute;
+    top: 200px;
+    left: 0;
+    right: 0;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 40px;
+    letter-spacing: 1px;
+    font-family: 'Roboto Slab', sans-serif;
+}
+#changeContent .project-info
+{
+    color: #fff;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 1rem;
+    font-size: 22px;
+    letter-spacing: 1px;
+    font-family: 'Roboto Slab', sans-serif;
+}
+#changeContent .project-info-e
+{
+    color: #00da24;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 1rem;
+    font-size: 22px;
+    letter-spacing: 1px;
+    font-family: 'Roboto Slab', sans-serif;
+}
+#changeContent button
+{
+    font-size: 24px;
+    font-family: 'Roboto Slab', sans-serif;
+    padding: 10px 20px;
+}
