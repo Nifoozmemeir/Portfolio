@@ -29,22 +29,6 @@ python -m pip install --upgrade pip
 ```sh
 pip install -r requirements.txt
 ```
-- Crear la base de datos ![windows-11-icon-logo-6C39629E45-seeklogo comasdasd](https://github.com/user-attachments/assets/3439ac37-728a-48fa-8d6f-8057f07e79fa)
-```sh
-py manage.py migrate
-```
-- Crear la base de datos ![linux-tux-logo-png-transparent-svg-vector-bie-supply-14aa](https://github.com/user-attachments/assets/bbc3c437-0056-4892-9986-ef2832156535)
-```sh
-python manage.py migrate
-```
-- Crear un super usuario ![windows-11-icon-logo-6C39629E45-seeklogo comasdasd](https://github.com/user-attachments/assets/3439ac37-728a-48fa-8d6f-8057f07e79fa)
-```sh
-py manage.py createsuperuser
-```
-- Crear un super usuario ![linux-tux-logo-png-transparent-svg-vector-bie-supply-14aa](https://github.com/user-attachments/assets/bbc3c437-0056-4892-9986-ef2832156535)
-```sh
-python manage.py createsuperuser
-```
 - Levantar el server ![windows-11-icon-logo-6C39629E45-seeklogo comasdasd](https://github.com/user-attachments/assets/3439ac37-728a-48fa-8d6f-8057f07e79fa)
 ```sh
 py manage.py runserver
