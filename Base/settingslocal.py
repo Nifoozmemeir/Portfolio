@@ -29,7 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',
     'Base.Core',
+    'django_cleanup.apps.CleanupConfig',  # SIEMPRE al final
 ]
 
 MIDDLEWARE = [
@@ -102,8 +104,19 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(RESOURCES_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# AWS S3 Configuration (LOCAL)
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+# Media files - S3 (LOCAL)
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media-dev/'
+STORAGES = {
+    "default": {"BACKEND": "Base.storagemedia.MediaStorageDev",},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",},
+}
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

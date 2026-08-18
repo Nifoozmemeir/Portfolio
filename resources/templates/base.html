@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Julián Rosas Sandillú | Portfolio{% endblock %}</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Portfolio de Julian Rosas - Full Stack Developer especializado en Django, Unity y tecnologías cloud. Creador de experiencias web y videojuegos.">
+    <meta name="keywords" content="full stack developer, game developer, unity, django, python, aws, postgresql, rosario, argentina">
+    <meta name="author" content="Julian Rosas Sandillú">
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Julian Rosas - Full Stack Developer & Game Designer">
+    <meta property="og:description" content="Portfolio profesional - Desarrollo web y videojuegos">
+    <meta property="og:image" content="{% static 'img/og-preview.jpg' %}">
+    <meta property="og:url" content="https://jersdev.com">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+    <link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Font Awesome 7 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS (Animate On Scroll) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- CSS del base -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <!-- Cursores personalizados -->
+    <style>
+        body {
+            cursor: url("{% static 'cursor/mousecursor.cur' %}") 4 4, auto; /* cursor por defecto */
+        }
+        a, button {
+            cursor: url("{% static 'cursor/mousehand.cur' %}") 4 4, pointer !important; /* manito */
+        }
+        input, textarea, select {
+            cursor: url("{% static 'cursor/mousetext.cur' %}") 4 16, text; /* cursor texto */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
+    </div>
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom" id="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#home">JERSdev</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#projects">Projects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#skills">Skills</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#experience">Experience</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="hero-bg-animation">
+            <div class="floating-shapes">
+                <div class="shape">
+                    <img src="{% static 'img/Foto CV 2025.jpg' %}" alt="Mi Foto">
+                </div>
+                <div class="shape"></div>
+                <div class="shape"></div>
+            </div>
+        </div>
+        <div class="hero-content">
+            <div data-aos="fade-up" data-aos-delay="100">
+                <p class="hero-subtitle">Welcome to my portfolio</p>
+            </div>
+            <div data-aos="fade-up" data-aos-delay="200">
+                <h1 class="hero-title">Hi, I'm <span class="name-3d" data-text="Julian Rosas Sandillú">Julian Rosas Sandillú</span></h1>
+            </div>
+            <div data-aos="fade-up" data-aos-delay="300">
+                <p class="hero-description">
+                    <span class="typing-text" id="typing-text"></span>
+                </p>
+            </div>
+            <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
+                <a href="#projects" class="btn-gradient"><i class="fa-solid fa-folder-open me-2"></i> View Projects</a>
+                <a href="#contact" class="btn-outline-gradient"><i class="fa-solid fa-envelope me-2"></i> Get In Touch</a>
+            </div>
+            <div class="social-links" data-aos="fade-up" data-aos-delay="500">
+                <a href="https://github.com/Nifoozmemeir" class="social-link" target="_blank"><i class="fa-brands fa-github"></i></a>
+                <a href="https://linkedin.com/in/julian-ers/" class="social-link" target="_blank"><i class="fa-brands fa-square-linkedin"></i></a>
+                <a href="https://linktr.ee/julian.ers" class="social-link" target="_blank"><i class="fa-brands fa-linktree"></i></a>
+                <a href="mailto:julian.ers@hotmail.com" class="social-link"><i class="fa-solid fa-envelope"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-discord"></i></a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+    </section>
+    <!-- About Me -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>{{ AboutMeContent.title }}</h2>
+                <p class="section-subtitle">{{ AboutMeContent.subtitle }}</p>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="about-image">
+                        <div class="gradient-border rounded-3 p-1">
+                            <div id="carouselAbout" class="carousel slide rounded-3 overflow-hidden" data-bs-ride="carousel" data-bs-interval="4000">
+                                <div class="carousel-indicators">
+                                    {% for img in AboutMeImages %}
+                                        <button type="button" data-bs-target="#carouselAbout" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                                    {% endfor %}
+                                </div>
+                                <div class="carousel-inner">
+                                    {% for img in AboutMeImages %}
+                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                            <img src="{{ img.image.url }}" class="d-block w-100 about-carousel-img" alt="{{ img.description }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselAbout" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselAbout" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="about-content">
+                        <h3 class="mb-4">{{ AboutMeContent.header }}</h3>
+                        <p class="text-muted mb-4">{{ AboutMeContent.paragraph }}</p>
+                        <div class="about-stats">
+                            <div class="row">
+                                {% for stat in AboutMeStats %}
+                                    <div class="col-4">
+                                        <h4 class="gradient-text">{{ stat.value }}</h4>
+                                        <p class="text-muted">{{ stat.label }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Projects Section -->
+    <section class="section projects-section" id="projects">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Featured Projects</h2>
+                <p class="section-subtitle">A selection of my recent work in game and web development</p>
+            </div>
+            <div class="project-filters" data-aos="fade-up" data-aos-delay="100">
+                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn" data-filter="game">Game Dev</button>
+                <button class="filter-btn" data-filter="web">Web Dev</button>
+                <button class="filter-btn" data-filter="mobile">Mobile</button>
+            </div>
+            <div class="projects-grid">
+                <!-- Project Card 1 -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="200" data-category="game">
+                    <div id="carouselSpaceCommander" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                            <button type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                            <button type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="{% static 'img/SpaceCommander1.gif' %}" class="d-block w-100 project-image" alt="Space Commander 1">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/SpaceCommander2.gif' %}" class="d-block w-100 project-image" alt="Space Commander 2">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/SpaceCommander3.gif' %}" class="d-block w-100 project-image" alt="Space Commander 3">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/SpaceCommander4.gif' %}" class="d-block w-100 project-image" alt="Space Commander 4">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/SpaceCommander5.gif' %}" class="d-block w-100 project-image" alt="Space Commander 5">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselSpaceCommander" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="project-tag">Unity</span>
+                            <span class="project-tag">C#</span>
+                            <span class="project-tag">Shoot 'Em Up</span>
+                        </div>
+                        <h3 class="project-title">Space Commander SEU</h3>
+                        <p class="project-description">A shoot'em up space adventure where you command through tough missions with your assistant Beepo.</p>
+                        <div class="project-links">
+                            <a href="https://mega.nz/file/VvRVFAAC#1T9TBBf35vAeyoCsmH0TfjN5RMJH50-wlIiD2xi9MVw" class="project-link"><i class="fa-solid fa-gamepad"></i> Demo</a>
+                            <a href="#" class="project-link"><i class="fa-brands fa-github"></i> Code</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project Card 2 -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="300" data-category="game">
+                    <div id="carouselGemsCrawler" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                            <button type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                            <button type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="{% static 'img/GemsCrawler1.gif' %}" class="d-block w-100 project-image" alt="Gems Crawler 1">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/GemsCrawler2.gif' %}" class="d-block w-100 project-image" alt="Gems Crawler 2">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/GemsCrawler3.gif' %}" class="d-block w-100 project-image" alt="Gems Crawler 3">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/GemsCrawler4.gif' %}" class="d-block w-100 project-image" alt="Gems Crawler 4">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'img/GemsCrawler5.gif' %}" class="d-block w-100 project-image" alt="Gems Crawler 5">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselGemsCrawler" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="project-tag">Unity</span>
+                            <span class="project-tag">C#</span>
+                            <span class="project-tag">RPG</span>
+                        </div>
+                        <h3 class="project-title">Gems Crawler</h3>
+                        <p class="project-description">An RPG dungeon crawler where you must find 15 gems to vanquish the village curse.</p>
+                        <div class="project-links">
+                            <a href="https://mega.nz/file/RqgUAbwL#B7aQMrduMhsIXpUF6D7VfD5xNKMG8Gt7JvbLNVJpMhE" class="project-link"><i class="fa-solid fa-gamepad"></i> Demo</a>
+                            <a href="https://www.youtube.com/watch?v=bTu7e3mc22s" class="project-link"><i class="fa-brands fa-youtube"></i> Trailer</a>
+                            <a href="#" class="project-link"><i class="fa-brands fa-github"></i> Code</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project Card 3 -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="400" data-category="web">
+                    <img src="{% static 'img/PagWeb1.gif' %}" alt="Web Project" class="project-image">
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="project-tag">Django</span>
+                            <span class="project-tag">Python</span>
+                            <span class="project-tag">PostgreSQL</span>
+                        </div>
+                        <h3 class="project-title">GameHub Platform</h3>
+                        <p class="project-description">A social platform for gamers to manage favorite games, with forums and messaging features.</p>
+                        <div class="project-links">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                            <a href="#" class="project-link"><i class="fa-brands fa-github"></i> Code</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Skills Section -->
+    <section class="section skills-section" id="skills">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Skills & Technologies</h2>
+                <p class="section-subtitle">The tools and technologies I work with to bring ideas to life</p>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="skill-icon">
+                        <i class="fa-brands fa-python"></i>
+                    </div>
+                    <h4 class="skill-name">Python</h4>
+                    <p class="skill-level">Advanced</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 90%;"></div>
+                    </div>
+                </div>
+                <div class="skill-card" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="skill-icon">
+                        <i class="fa-brands fa-square-js"></i>
+                    </div>
+                    <h4 class="skill-name">JavaScript</h4>
+                    <p class="skill-level">Intermediate</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 75%;"></div>
+                    </div>
+                </div>
+                <div class="skill-card" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="skill-icon">
+                        <i class="fa-brands fa-unity"></i>
+                    </div>
+                    <h4 class="skill-name">Unity / C#</h4>
+                    <p class="skill-level">Advanced</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 85%;"></div>
+                    </div>
+                </div>
+                <div class="skill-card" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="skill-icon">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <h4 class="skill-name">PostgreSQL</h4>
+                    <p class="skill-level">Intermediate</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 70%;"></div>
+                    </div>
+                </div>
+                <div class="skill-card" data-aos="zoom-in" data-aos-delay="500">
+                    <div class="skill-icon">
+                        <i class="fa-brands fa-aws"></i>
+                    </div>
+                    <h4 class="skill-name">AWS</h4>
+                    <p class="skill-level">Intermediate</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 65%;"></div>
+                    </div>
+                </div>
+                <div class="skill-card" data-aos="zoom-in" data-aos-delay="600">
+                    <div class="skill-icon">
+                        <i class="fa-brands fa-bootstrap"></i>
+                    </div>
+                    <h4 class="skill-name">Bootstrap</h4>
+                    <p class="skill-level">Advanced</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 80%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Experience Section -->
+    <section class="section experience-section" id="experience">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Experience</h2>
+                <p class="section-subtitle">My professional journey and key milestones</p>
+            </div>
+            <!-- Timeline aquí -->
+        </div>
+    </section>
+    <!-- Contact Section -->
+    <section class="section contact-section" id="contact">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Get In Touch</h2>
+                <p class="section-subtitle">Have a project in mind? Let's work together to bring your ideas to life</p>
+            </div>
+            <div class="contact-form" data-aos="fade-up" data-aos-delay="100">
+                <form id="contactForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Your Name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Subject" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" placeholder="Your Message" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn-gradient"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#home" class="footer-link">Home</a>
+                    <a href="#about" class="footer-link">About</a>
+                    <a href="#projects" class="footer-link">Projects</a>
+                    <a href="#contact" class="footer-link">Contact</a>
+                </div>
+                <p class="footer-copy">© 2024 Julian Rosas. Built with Django & ❤️ in Rosario, Argentina.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- JS Scripts -->
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <!-- AOS (Animate On Scroll) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- JS del base -->
+    <script src="{% static 'js/base.js' %}"></script>
+</body>
+</html>

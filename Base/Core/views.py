@@ -1,7 +1,11 @@
 from django.shortcuts import render
+from .models import AboutMeContent, AboutMeStat, AboutMeImage
 
-def WelcomeIndex(request):
-    return render(request, "welcome_index.html")
+def Home(request):
+    aboutmecontent = AboutMeContent.load()
+    aboutmestats = AboutMeStat.objects.all()
+    aboutmeimages = AboutMeImage.objects.all()
+    return render(request, "base.html", {'AboutMeContent': aboutmecontent, 'AboutMeStats': aboutmestats, 'AboutMeImages': aboutmeimages})
 
 def Index(request):
     return render(request, "index.html")
