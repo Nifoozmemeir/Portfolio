@@ -12,9 +12,15 @@ venv/
 .vscode/
 .idea/
 
+# Ignorar archivos de Claude Code
+.claude/
+
 # Ignorar archivos de log y bases de datos locales
 *.log
 *.sqlite3
+
+# Ignorar archivos estáticos generados por Django (collectstatic)
+staticfiles/
 
 # Ignorar archivos de configuración sensibles
 .env
