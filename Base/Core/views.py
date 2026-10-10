@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from .models import AboutMeContent, AboutMeStat, AboutMeImage
+from .models import AboutMeContent, AboutMeStat, AboutMeImage, Project, ProjectCategory
 
 def Home(request):
     aboutmecontent = AboutMeContent.load()
     aboutmestats = AboutMeStat.objects.all()
     aboutmeimages = AboutMeImage.objects.all()
-    return render(request, "base.html", {'AboutMeContent': aboutmecontent, 'AboutMeStats': aboutmestats, 'AboutMeImages': aboutmeimages})
+    projects = Project.objects.select_related('category').prefetch_related('images', 'tags', 'links')
+    projectcategories = ProjectCategory.objects.all()
+    return render(request, "base.html", {'AboutMeContent': aboutmecontent, 'AboutMeStats': aboutmestats, 'AboutMeImages': aboutmeimages, 'Projects': projects, 'ProjectCategories': projectcategories})
 
 def Index(request):
     return render(request, "index.html")

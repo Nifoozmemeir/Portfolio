@@ -24,6 +24,40 @@ class AboutMeImageAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
+class ProjectImageInline(admin.TabularInline):
+    model = ProjectImage
+    extra = 1
+    fields = ('image', 'description', 'order')
+    ordering = ('order',)
+
+class ProjectTagInline(admin.TabularInline):
+    model = ProjectTag
+    extra = 1
+    fields = ('name', 'order')
+    ordering = ('order',)
+
+class ProjectLinkInline(admin.TabularInline):
+    model = ProjectLink
+    extra = 1
+    fields = ('label', 'url', 'icon', 'order')
+    ordering = ('order',)
+
+class ProjectCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'slug', 'order')
+    search_fields = ('name',)
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('order',)
+
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('title', 'id', 'category', 'order')
+    list_filter = (('category', RelatedDropdownFilter),)
+    search_fields = ('title', 'description')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('order',)
+    inlines = (ProjectImageInline, ProjectTagInline, ProjectLinkInline)
+
 admin.site.register(AboutMeContent, AboutMeContentAdmin)
 admin.site.register(AboutMeStat, AboutMeStatAdmin)
 admin.site.register(AboutMeImage, AboutMeImageAdmin)
+admin.site.register(ProjectCategory, ProjectCategoryAdmin)
+admin.site.register(Project, ProjectAdmin)
