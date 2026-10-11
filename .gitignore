@@ -25,6 +25,7 @@ staticfiles/
 # Ignorar archivos de configuración sensibles
 .env
 .env.*
+!.env.example
 
 # Ignorar archivos creados por el sistema operativo
 .DS_Store

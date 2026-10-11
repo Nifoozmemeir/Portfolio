@@ -1,0 +1,111 @@
+# Pipeline de jersdev.com
+#
+# Cada push a main:
+#   1. test   -> máquina limpia de GitHub: instala requirements, levanta Postgres 16,
+#                chequea settings de producción, migraciones y corre los tests de humo.
+#   2. deploy -> SOLO si los tests pasaron: entra por SSH al Lightsail y corre deploy.sh
+#                (pull, pip, check, migrate, collectstatic, restart y verificación).
+#
+# También se puede disparar a mano: pestaña Actions > "CI/CD" > Run workflow.
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Si pusheás dos veces seguidas, no corren dos deploys a la vez
+concurrency:
+  group: deploy-produccion
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Tests de humo
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: portfolio_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # Variables de mentira con los mismos nombres que el .env del server.
+    # Si agregás un config('ALGO') nuevo al settings y no lo sumás acá, el CI falla:
+    # ese es el aviso de que también falta en el .env del server.
+    env:
+      DJANGO_SETTINGS_MODULE: Base.settingsproduction
+      SECRET_KEY_PROD: ci-clave-larga-de-prueba-solo-para-github-actions-no-es-secreta-123456
+      LIGHTSAIL_IP: 127.0.0.1
+      DB_NAME_PROD: portfolio_ci
+      DB_USER_PROD: ci
+      DB_PASSWORD_PROD: ci
+      DB_HOST_PROD: localhost
+      DB_PORT_PROD: "5432"
+      AWS_ACCESS_KEY_ID: ci
+      AWS_SECRET_ACCESS_KEY: ci
+      AWS_STORAGE_BUCKET_NAME: ci-bucket
+      AWS_S3_REGION_NAME: us-east-1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias del sistema (para compilar psycopg2)
+        run: sudo apt-get update -q && sudo apt-get install -y -q libpq-dev
+
+      - name: Instalar requirements.txt
+        run: pip install -r requirements.txt
+
+      - name: Settings de producción sanos (check --deploy)
+        run: python manage.py check --deploy --fail-level ERROR
+
+      - name: No falta ninguna migración por generar
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Las migraciones corren desde cero
+        run: python manage.py migrate --noinput
+
+      - name: Tests de humo (ninguna página tira 500)
+        run: python manage.py test --noinput -v 2
+
+  deploy:
+    name: Deploy a Lightsail
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Preparar llave SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Correr deploy.sh en el server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        # Baja el deploy.sh más nuevo de GitHub y lo corre. Así un cambio en el propio
+        # script se aplica en el mismo deploy, y el script no se pisa mientras corre.
+        run: |
+          ssh -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" \
+            'cd /var/www/Portfolio && git fetch --quiet origin main && git show origin/main:deploy.sh > /tmp/deploy.sh && bash /tmp/deploy.sh'
