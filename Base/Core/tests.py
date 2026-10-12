@@ -9,6 +9,9 @@ agregás una sección o un model nuevo quedan cubiertos sin escribir nada.
 Corren con la base VACÍA: si una vista o un template asume que siempre
 hay contenido cargado, el test lo detecta antes que un visitante.
 """
+import io
+import json
+import os
 import tempfile
 
 from django.conf import settings
@@ -134,3 +137,25 @@ class SmokeEstaticosTest(TestCase):
             chequearUrlsPublicas(self)
             respuesta = Client(raise_request_exception=False).get(reverse('admin:login'), secure=True)
             self.assertEqual(respuesta.status_code, 200, "El login del admin no levanta con estáticos versionados")
+
+    def testLimpiarEstaticosBorraSoloLoQueNoSeUsa(self):
+        # limpiarestaticos borra archivos en producción (deploy.sh): tiene que borrar lo viejo y NUNCA algo en uso
+        with tempfile.TemporaryDirectory() as carpeta, self.settings(STATIC_ROOT=carpeta, STORAGES=STORAGES_CON_MANIFEST):
+            call_command('collectstatic', interactive=False, verbosity=0)
+            # Basura de deploys anteriores: una versión vieja con hash y un archivo que se sacó del código
+            viejos = [os.path.join(carpeta, 'css', 'base.aaaaaaaaaaaa.css'), os.path.join(carpeta, 'img', 'viejo.gif')]
+            for ruta in viejos:
+                os.makedirs(os.path.dirname(ruta), exist_ok=True)
+                open(ruta, 'w').close()
+
+            call_command('limpiarestaticos', stdout=io.StringIO())
+
+            for ruta in viejos:
+                self.assertFalse(os.path.exists(ruta), f"No borró el archivo viejo {ruta}")
+            with open(os.path.join(carpeta, 'staticfiles.json'), encoding='utf-8') as manifest:
+                usados = json.load(manifest)['paths']
+            for original, versionado in usados.items():
+                for nombre in (original, versionado):
+                    with self.subTest(archivo=nombre):
+                        self.assertTrue(os.path.exists(os.path.join(carpeta, nombre)), f"Borró {nombre}, que está en uso")
+            chequearUrlsPublicas(self)

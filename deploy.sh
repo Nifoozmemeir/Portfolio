@@ -74,6 +74,12 @@ main() {
     verificarSitio
 
     trap - ERR
+
+    # Recién con el sitio verificado: gunicorn ya usa el manifest nuevo, así que las versiones viejas no las pide nadie.
+    # Si la limpieza falla, solo avisa (no hace rollback): el sitio ya está andando.
+    log "Limpiando estáticos viejos de S3 (versiones anteriores y archivos que ya no están en el código)"
+    python manage.py limpiarestaticos || log "AVISO: no se pudieron limpiar los estáticos viejos (el sitio anda igual)"
+
     log "Deploy terminado: $(git log --oneline -1)"
 }
 

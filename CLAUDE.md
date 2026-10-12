@@ -141,7 +141,7 @@ Cada push a `main` (o "Run workflow" a mano en Actions) dispara [.github/workflo
 1. **Job `test`** (ubuntu-24.04, Python 3.12, Postgres 16 como service, `DJANGO_SETTINGS_MODULE=Base.settingsproduction` con variables de mentira): `pip install -r requirements.txt` → `check --deploy --fail-level ERROR` → `makemigrations --check --dry-run` → `migrate` desde cero → `manage.py test`.
 2. **Job `deploy`** (solo si pasó `test`): entra por SSH (secrets `SSH_KEY`, `SSH_HOST`, `SSH_USER`) y corre la versión de [deploy.sh](deploy.sh) que está en `origin/main`.
 
-[deploy.sh](deploy.sh) en `/var/www/Portfolio` (venv `venv/`): `git reset --hard origin/main` → `pip install` → `check --deploy` → `migrate` → `collectstatic` (a S3) → `systemctl restart gunicorn` → verifica que `/` y `/admin/login/` respondan 200. Si algo falla, rollback automático al commit anterior (la base no vuelve atrás).
+[deploy.sh](deploy.sh) en `/var/www/Portfolio` (venv `venv/`): `git reset --hard origin/main` → `pip install` → `check --deploy` → `migrate` → `collectstatic` (a S3) → `systemctl restart gunicorn` → verifica que `/` y `/admin/login/` respondan 200 → `limpiarestaticos` (comando propio en `Base/Core/management/commands/`: borra de `static/` en S3 todo lo que no figura en `staticfiles.json`, o sea versiones viejas con hash y archivos sacados del código; si falla solo avisa). Si algo falla antes de la verificación, rollback automático al commit anterior (la base no vuelve atrás).
 
 Qué revisar en cada cambio para no romperlo:
 
@@ -151,6 +151,7 @@ Qué revisar en cada cambio para no romperlo:
 - **URL o página nueva** → que no rompa con la base vacía (los tests corren sin datos). Si la home cambia de ruta o se agrega una página crítica, actualizar `URLS_A_VERIFICAR` en `deploy.sh`.
 - **`URLS_VIEJAS`** en `tests.py` es **momentáneo**: las URLs viejas que, si tiran 500, solo dan warning y no cortan el deploy. Se mantiene así **hasta que el usuario diga lo contrario**; no vaciarla ni quitar la excepción por iniciativa propia (ni siquiera al borrar las vistas viejas). Cuando lo pida, se elimina el mecanismo y toda URL que tire 500 corta el pipeline, sin excepciones. Nunca sumar URLs nuevas a esa lista para esquivar un fallo.
 - Cualquier edición a mano en el server se pisa con el `reset --hard`: todo cambio va por el repo.
+- **Estáticos versionados en producción** (`S3ManifestStaticStorage`): cada estático está dos veces en `static/` del bucket, el original (`base.css`) y el versionado (`base.<hash>.css`). La página usa **solo el versionado**, según `static/staticfiles.json`. Las versiones viejas las borra solo `limpiarestaticos` en cada deploy, así que nunca se acumulan. En `static/` no se borra nada a mano: si se borra un versionado, ese archivo da 404 hasta volver a correr `collectstatic` (Actions → "CI/CD" → Run workflow). En local no aplica: con `DEBUG = True` se sirven sin hash.
 
 ### Comandos
 
