@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
+    'django_admin_listfilter_dropdown',
     'Base.Core',
     'django_cleanup.apps.CleanupConfig',  # SIEMPRE al final
 ]

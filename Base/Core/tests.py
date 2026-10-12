@@ -9,9 +9,14 @@ agregás una sección o un model nuevo quedan cubiertos sin escribir nada.
 Corren con la base VACÍA: si una vista o un template asume que siempre
 hay contenido cargado, el test lo detecta antes que un visitante.
 """
+import tempfile
+
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.core.management import call_command
+from django.template.loader import get_template
+from django.test import Client, TestCase, override_settings
 from django.urls import URLPattern, URLResolver, get_resolver, reverse
 
 
@@ -26,8 +31,13 @@ URLS_VIEJAS = [
     '/final-project',
 ]
 
+# Estáticos sin versionar para los tests comunes: con estáticos versionados (manifest),
+# {% static %} necesita que antes se haya corrido collectstatic. Eso lo prueba aparte SmokeEstaticosTest.
+STORAGES_SIN_MANIFEST = {**settings.STORAGES, 'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}}
+STORAGES_CON_MANIFEST = {**settings.STORAGES, 'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'}}
 
-def UrlsPublicas(resolver=None, prefijo=''):
+
+def urlsPublicas(resolver=None, prefijo=''):
     """Devuelve todas las URLs sin parámetros, salteando el admin."""
     resolver = resolver or get_resolver()
     for patron in resolver.url_patterns:
@@ -35,48 +45,67 @@ def UrlsPublicas(resolver=None, prefijo=''):
         if isinstance(patron, URLResolver):
             if ruta.startswith('admin'):
                 continue
-            yield from UrlsPublicas(patron, prefijo + ruta)
+            yield from urlsPublicas(patron, prefijo + ruta)
         elif isinstance(patron, URLPattern) and patron.pattern.regex.groups == 0:
             yield '/' + prefijo + ruta.lstrip('^').rstrip('$')
 
 
+def chequearUrlsPublicas(test):
+    """Pide todas las URLs públicas y falla si alguna tira 500 (las de URLS_VIEJAS solo avisan)."""
+    # raise_request_exception=False: si la vista explota, devuelve un 500 en vez de cortar el test
+    cliente = Client(raise_request_exception=False)
+    for url in urlsPublicas():
+        with test.subTest(url=url):
+            # secure=True: en producción SECURE_SSL_REDIRECT manda todo a HTTPS
+            respuesta = cliente.get(url, secure=True, follow=True)
+            if respuesta.status_code >= 500 and url in URLS_VIEJAS:
+                # Formato que GitHub Actions muestra como warning amarillo
+                print(f"::warning title=URL vieja rota::{url} devuelve {respuesta.status_code} (está en URLS_VIEJAS, no corta el pipeline)")
+                continue
+            test.assertLess(respuesta.status_code, 500, f"{url} devolvió {respuesta.status_code}")
+
+
+@override_settings(STORAGES=STORAGES_SIN_MANIFEST)
 class SmokePublicoTest(TestCase):
 
-    def test_hay_urls_para_probar(self):
-        self.assertTrue(list(UrlsPublicas()), "No se encontró ninguna URL pública, algo está muy mal")
+    def testHayUrlsParaProbar(self):
+        self.assertTrue(list(urlsPublicas()), "No se encontró ninguna URL pública, algo está muy mal")
 
-    def test_ninguna_pagina_publica_tira_500(self):
-        # raise_request_exception=False: si la vista explota, devuelve un 500 en vez de cortar el test
-        cliente = Client(raise_request_exception=False)
-        for url in UrlsPublicas():
-            with self.subTest(url=url):
-                # secure=True: en producción SECURE_SSL_REDIRECT manda todo a HTTPS
-                respuesta = cliente.get(url, secure=True, follow=True)
-                if respuesta.status_code >= 500 and url in URLS_VIEJAS:
-                    # Formato que GitHub Actions muestra como warning amarillo
-                    print(f"::warning title=URL vieja rota::{url} devuelve {respuesta.status_code} (está en URLS_VIEJAS, no corta el pipeline)")
-                    continue
-                self.assertLess(respuesta.status_code, 500, f"{url} devolvió {respuesta.status_code}")
+    def testNingunaPaginaPublicaTira500(self):
+        chequearUrlsPublicas(self)
 
-    def test_login_del_admin_levanta(self):
+    def testLoginDelAdminLevanta(self):
         respuesta = self.client.get(reverse('admin:login'), secure=True)
         self.assertEqual(respuesta.status_code, 200)
 
 
+@override_settings(STORAGES=STORAGES_SIN_MANIFEST)
 class SmokeAdminTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.Superusuario = get_user_model().objects.create_superuser('smoke', 'smoke@test.com', 'smoke-pass-123')
+        cls.superusuario = get_user_model().objects.create_superuser('smoke', 'smoke@test.com', 'smoke-pass-123')
 
     def setUp(self):
-        self.client.force_login(self.Superusuario)
+        self.client.force_login(self.superusuario)
 
-    def test_home_del_admin(self):
+    def testHomeDelAdmin(self):
         respuesta = self.client.get(reverse('admin:index'), secure=True)
         self.assertEqual(respuesta.status_code, 200)
 
-    def test_listado_y_alta_de_cada_model_registrado(self):
+    def testTemplatesDeLosFiltrosExisten(self):
+        # Con la base vacía los filtros no se dibujan, así que el test del listado no
+        # detecta un template faltante (ej: el paquete del filtro fuera de INSTALLED_APPS).
+        # Acá se carga el template de cada filtro de cada admin directamente.
+        for model, modeladmin in admin.site._registry.items():
+            for filtro in modeladmin.list_filter:
+                clase = filtro[1] if isinstance(filtro, (tuple, list)) else filtro
+                if isinstance(clase, str):
+                    continue  # Solo el nombre del campo: usa el filtro default de Django
+                with self.subTest(model=model._meta.model_name, filtro=clase.__name__):
+                    get_template(clase.template)
+
+    def testListadoYAltaDeCadaModelRegistrado(self):
         for model in admin.site._registry:
             app = model._meta.app_label
             nombre = model._meta.model_name
@@ -85,3 +114,23 @@ class SmokeAdminTest(TestCase):
                 with self.subTest(model=nombre, vista=vista):
                     respuesta = self.client.get(url, secure=True, follow=True)
                     self.assertLess(respuesta.status_code, 500, f"{url} devolvió {respuesta.status_code}")
+
+
+class SmokeEstaticosTest(TestCase):
+    """
+    Simula lo que pasa en producción con los estáticos versionados (base.3f2a91c.js):
+    corre un collectstatic real en una carpeta temporal y después pide las páginas.
+    Detecta antes del deploy:
+      - un url(...) de un CSS que apunta a un archivo que no existe (collectstatic falla)
+      - un {% static '...' %} de un template que apunta a un archivo que no existe (la página tira 500)
+    """
+
+    def testCollectstaticYPaginasConEstaticosVersionados(self):
+        with tempfile.TemporaryDirectory() as carpeta, self.settings(STATIC_ROOT=carpeta, STORAGES=STORAGES_CON_MANIFEST):
+            try:
+                call_command('collectstatic', interactive=False, verbosity=0)
+            except Exception as error:
+                self.fail(f"collectstatic falla (en el deploy fallaría igual): {error}")
+            chequearUrlsPublicas(self)
+            respuesta = Client(raise_request_exception=False).get(reverse('admin:login'), secure=True)
+            self.assertEqual(respuesta.status_code, 200, "El login del admin no levanta con estáticos versionados")

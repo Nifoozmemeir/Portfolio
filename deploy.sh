@@ -14,7 +14,7 @@ URLS_A_VERIFICAR=("https://jersdev.com/" "https://jersdev.com/admin/login/")
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
-verificar_sitio() {
+verificarSitio() {
     for url in "${URLS_A_VERIFICAR[@]}"; do
         local codigo=""
         for intento in 1 2 3 4 5; do
@@ -36,8 +36,8 @@ main() {
     source venv/bin/activate
     export DJANGO_SETTINGS_MODULE=Base.settingsproduction
 
-    local commit_anterior
-    commit_anterior=$(git rev-parse HEAD)
+    local commitanterior
+    commitanterior=$(git rev-parse HEAD)
     log "Commit actual: $(git log --oneline -1)"
 
     log "1/6 Bajando código de GitHub"
@@ -47,8 +47,8 @@ main() {
     log "    Ahora en: $(git log --oneline -1)"
 
     rollback() {
-        log "ROLLBACK: volviendo a $commit_anterior"
-        git reset --hard "$commit_anterior"
+        log "ROLLBACK: volviendo a $commitanterior"
+        git reset --hard "$commitanterior"
         pip install --quiet -r requirements.txt
         sudo systemctl restart gunicorn
         log "Código restaurado. Ojo: si una migración nueva ya se aplicó, la base NO vuelve atrás sola."
@@ -71,7 +71,7 @@ main() {
     log "6/6 Reiniciando gunicorn y verificando"
     sudo systemctl restart gunicorn
     sleep 3
-    verificar_sitio
+    verificarSitio
 
     trap - ERR
     log "Deploy terminado: $(git log --oneline -1)"

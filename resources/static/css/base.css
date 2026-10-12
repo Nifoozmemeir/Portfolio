@@ -462,6 +462,11 @@ body {
 .project-card:hover .project-image {
     transform: scale(1.1);
 }
+/* Fondo mientras el video no se descargó */
+.project-video {
+    display: block;
+    background: var(--darker-bg);
+}
 .project-content {
     padding: 25px;
 }

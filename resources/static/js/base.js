@@ -101,6 +101,39 @@ filterBtns.forEach(btn => {
         });
     });
 });
+// Videos de los Projects, en 3 etapas para que nunca se vea un recuadro vacío sin bajar todo de una:
+// 1. Al cargar la página: preload="metadata" + "#t=0.001" en la URL, solo se bajan unos KB
+//    para dibujar el primer frame (el #t=0.001 hace que Safari/iPhone también lo dibuje).
+// 2. Cuando una card está a 600px de entrar en pantalla, sus videos empiezan a bajarse enteros.
+// 3. Cuando el video está a la vista se reproduce, y cuando sale se pausa.
+//    En el carrusel los slides inactivos tienen display:none, así que solo se reproduce el activo.
+const projectVideos = document.querySelectorAll('.project-video');
+const preloadObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.project-video').forEach(video => {
+                const wasPlaying = !video.paused; // load() reinicia el video: si ya estaba andando, se vuelve a reproducir
+                video.preload = 'auto';
+                video.load();
+                if (wasPlaying) video.play().catch(() => {});
+            });
+            preloadObserver.unobserve(entry.target);
+        }
+    });
+}, { rootMargin: '600px 0px' });
+projectCards.forEach(card => {
+    if (card.querySelector('.project-video')) preloadObserver.observe(card);
+});
+const videoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.play().catch(err => console.warn('Video de project no arrancó:', err));
+        } else {
+            entry.target.pause();
+        }
+    });
+}, { threshold: 0.5 });
+projectVideos.forEach(video => videoObserver.observe(video));
 // Efecto scroll al hacer click
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

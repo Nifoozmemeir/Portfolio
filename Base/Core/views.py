@@ -1,13 +1,16 @@
+from django.db.models import Prefetch
 from django.shortcuts import render
-from .models import AboutMeContent, AboutMeStat, AboutMeImage, Project, ProjectCategory
+from .models import AboutMeContent, AboutMeStat, AboutMeImage, Project, ProjectCategory, ProjectImage, Skill
 
-def Home(request):
+def home(request):
     aboutmecontent = AboutMeContent.load()
     aboutmestats = AboutMeStat.objects.all()
     aboutmeimages = AboutMeImage.objects.all()
-    projects = Project.objects.select_related('category').prefetch_related('images', 'tags', 'links')
+    projectimages = ProjectImage.objects.exclude(file__isnull=True).exclude(file='') # Una fila sin archivo no se muestra (si no, media.file.url tira 500)
+    projects = Project.objects.select_related('category').prefetch_related(Prefetch('images', queryset=projectimages), 'tags', 'links')
     projectcategories = ProjectCategory.objects.all()
-    return render(request, "base.html", {'AboutMeContent': aboutmecontent, 'AboutMeStats': aboutmestats, 'AboutMeImages': aboutmeimages, 'Projects': projects, 'ProjectCategories': projectcategories})
+    skills = Skill.objects.select_related('level')
+    return render(request, "base.html", {'aboutmecontent': aboutmecontent, 'aboutmestats': aboutmestats, 'aboutmeimages': aboutmeimages, 'projects': projects, 'projectcategories': projectcategories, 'skills': skills})
 
 def Index(request):
     return render(request, "index.html")

@@ -14,7 +14,6 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Julian Rosas - Full Stack Developer & Game Designer">
     <meta property="og:description" content="Portfolio profesional - Desarrollo web y videojuegos">
-    <meta property="og:image" content="{% static 'img/og-preview.jpg' %}">
     <meta property="og:url" content="https://jersdev.com">
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
@@ -128,8 +127,8 @@
     <section class="section about-section" id="about">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
-                <h2>{{ AboutMeContent.title }}</h2>
-                <p class="section-subtitle">{{ AboutMeContent.subtitle }}</p>
+                <h2>About Me</h2>
+                <p class="section-subtitle">Passionate developer from Rosario, Argentina, creating digital experiences since 2023</p>
             </div>
             <div class="row align-items-center">
                 <div class="col-lg-6" data-aos="fade-right">
@@ -137,12 +136,12 @@
                         <div class="gradient-border rounded-3 p-1">
                             <div id="carouselAbout" class="carousel slide rounded-3 overflow-hidden" data-bs-ride="carousel" data-bs-interval="4000">
                                 <div class="carousel-indicators">
-                                    {% for img in AboutMeImages %}
+                                    {% for img in aboutmeimages %}
                                         <button type="button" data-bs-target="#carouselAbout" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
                                     {% endfor %}
                                 </div>
                                 <div class="carousel-inner">
-                                    {% for img in AboutMeImages %}
+                                    {% for img in aboutmeimages %}
                                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                             <img src="{{ img.image.url }}" class="d-block w-100 about-carousel-img" alt="{{ img.description }}">
                                         </div>
@@ -162,11 +161,11 @@
                 </div>
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="about-content">
-                        <h3 class="mb-4">{{ AboutMeContent.header }}</h3>
-                        <p class="text-muted mb-4">{{ AboutMeContent.paragraph }}</p>
+                        <h3 class="mb-4">{{ aboutmecontent.header }}</h3>
+                        <p class="text-muted mb-4">{{ aboutmecontent.paragraph }}</p>
                         <div class="about-stats">
                             <div class="row">
-                                {% for stat in AboutMeStats %}
+                                {% for stat in aboutmestats %}
                                     <div class="col-4">
                                         <h4 class="gradient-text">{{ stat.value }}</h4>
                                         <p class="text-muted">{{ stat.label }}</p>
@@ -188,34 +187,42 @@
             </div>
             <div class="project-filters" data-aos="fade-up" data-aos-delay="100">
                 <button class="filter-btn active" data-filter="all">All Projects</button>
-                {% for category in ProjectCategories %}
+                {% for category in projectcategories %}
                     <button class="filter-btn" data-filter="{{ category.slug }}">{{ category.name }}</button>
                 {% endfor %}
             </div>
             <div class="projects-grid">
-                {% for project in Projects %}
-                    {% with images=project.images.all %}
+                {% for project in projects %}
+                    {% with medias=project.images.all %}
                     <div class="project-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:1 }}00" data-category="{{ project.category.slug }}">
-                        {% if images|length > 1 %}
+                        {% if medias|length > 1 %}
                             <div id="carouselProject{{ project.pk }}" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-indicators">
-                                    {% for img in images %}
+                                    {% for media in medias %}
                                         <button type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
                                     {% endfor %}
                                 </div>
                                 <div class="carousel-inner">
-                                    {% for img in images %}
+                                    {% for media in medias %}
                                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                            <img src="{{ img.image.url }}" class="d-block w-100 project-image" alt="{{ img.description }}">
+                                            {% if media.isVideo %}
+                                                <video src="{{ media.file.url }}#t=0.001" class="d-block w-100 project-image project-video" preload="metadata" muted loop playsinline aria-label="{{ media.description }}"></video>
+                                            {% else %}
+                                                <img src="{{ media.file.url }}" class="d-block w-100 project-image" alt="{{ media.description }}" loading="lazy">
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 </div>
                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
                                 <button class="carousel-control-next" type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
                             </div>
-                        {% elif images %}
-                            {% with img=images.0 %}
-                                <img src="{{ img.image.url }}" class="project-image" alt="{{ img.description }}">
+                        {% elif medias %}
+                            {% with media=medias.0 %}
+                                {% if media.isVideo %}
+                                    <video src="{{ media.file.url }}#t=0.001" class="project-image project-video" preload="metadata" muted loop playsinline aria-label="{{ media.description }}"></video>
+                                {% else %}
+                                    <img src="{{ media.file.url }}" class="project-image" alt="{{ media.description }}" loading="lazy">
+                                {% endif %}
                             {% endwith %}
                         {% endif %}
                         <div class="project-content">
@@ -246,66 +253,18 @@
                 <p class="section-subtitle">The tools and technologies I work with to bring ideas to life</p>
             </div>
             <div class="skills-grid">
-                <div class="skill-card" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="skill-icon">
-                        <i class="fa-brands fa-python"></i>
+                {% for skill in skills %}
+                    <div class="skill-card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00">
+                        <div class="skill-icon">
+                            <i class="{{ skill.icon }}"></i>
+                        </div>
+                        <h4 class="skill-name">{{ skill.name }}</h4>
+                        <p class="skill-level">{{ skill.level.name }}</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" style="width: {{ skill.percentage }}%;"></div>
+                        </div>
                     </div>
-                    <h4 class="skill-name">Python</h4>
-                    <p class="skill-level">Advanced</p>
-                    <div class="skill-progress">
-                        <div class="skill-progress-bar" style="width: 90%;"></div>
-                    </div>
-                </div>
-                <div class="skill-card" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="skill-icon">
-                        <i class="fa-brands fa-square-js"></i>
-                    </div>
-                    <h4 class="skill-name">JavaScript</h4>
-                    <p class="skill-level">Intermediate</p>
-                    <div class="skill-progress">
-                        <div class="skill-progress-bar" style="width: 75%;"></div>
-                    </div>
-                </div>
-                <div class="skill-card" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="skill-icon">
-                        <i class="fa-brands fa-unity"></i>
-                    </div>
-                    <h4 class="skill-name">Unity / C#</h4>
-                    <p class="skill-level">Advanced</p>
-                    <div class="skill-progress">
-                        <div class="skill-progress-bar" style="width: 85%;"></div>
-                    </div>
-                </div>
-                <div class="skill-card" data-aos="zoom-in" data-aos-delay="400">
-                    <div class="skill-icon">
-                        <i class="fa-solid fa-database"></i>
-                    </div>
-                    <h4 class="skill-name">PostgreSQL</h4>
-                    <p class="skill-level">Intermediate</p>
-                    <div class="skill-progress">
-                        <div class="skill-progress-bar" style="width: 70%;"></div>
-                    </div>
-                </div>
-                <div class="skill-card" data-aos="zoom-in" data-aos-delay="500">
-                    <div class="skill-icon">
-                        <i class="fa-brands fa-aws"></i>
-                    </div>
-                    <h4 class="skill-name">AWS</h4>
-                    <p class="skill-level">Intermediate</p>
-                    <div class="skill-progress">
-                        <div class="skill-progress-bar" style="width: 65%;"></div>
-                    </div>
-                </div>
-                <div class="skill-card" data-aos="zoom-in" data-aos-delay="600">
-                    <div class="skill-icon">
-                        <i class="fa-brands fa-bootstrap"></i>
-                    </div>
-                    <h4 class="skill-name">Bootstrap</h4>
-                    <p class="skill-level">Advanced</p>
-                    <div class="skill-progress">
-                        <div class="skill-progress-bar" style="width: 80%;"></div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </section>

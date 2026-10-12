@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
+    'django_admin_listfilter_dropdown',
     'Base.Core',
     'django_cleanup.apps.CleanupConfig',  # SIEMPRE al final
 ]
@@ -119,7 +120,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 STORAGES = {
     "default": {"BACKEND": "Base.storagemedia.MediaStorageProd",},
-    "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage",},
+    "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage",},
 }
 
 # Default primary key field type
