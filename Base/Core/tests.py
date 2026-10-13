@@ -21,6 +21,9 @@ from django.core.management import call_command
 from django.template.loader import get_template
 from django.test import Client, TestCase, override_settings
 from django.urls import URLPattern, URLResolver, get_resolver, reverse
+from django.utils import translation
+
+from Base.Core.traduccion import idiomasDestino, leerPo, rutaPo, textosDeLosTemplates
 
 
 # URLs viejas que se van con el revamp (paso 3). Si tiran 500 NO cortan el pipeline:
@@ -117,6 +120,49 @@ class SmokeAdminTest(TestCase):
                 with self.subTest(model=nombre, vista=vista):
                     respuesta = self.client.get(url, secure=True, follow=True)
                     self.assertLess(respuesta.status_code, 500, f"{url} devolvió {respuesta.status_code}")
+
+
+@override_settings(STORAGES=STORAGES_SIN_MANIFEST)
+class SmokeIdiomasTest(TestCase):
+    """
+    El sitio en cada idioma de LANGUAGES (/, /en/, /pt/): que levante con la base vacía y que
+    el texto fijo de los templates ({% translate %}) esté traducido y compilado.
+    """
+
+    def testHomeEnCadaIdioma(self):
+        cliente = Client(raise_request_exception=False)
+        for codigo, _ in settings.LANGUAGES:
+            with translation.override(codigo):
+                url = reverse('home')
+            with self.subTest(url=url):
+                respuesta = cliente.get(url, secure=True)
+                self.assertEqual(respuesta.status_code, 200, f"{url} devolvió {respuesta.status_code}")
+                self.assertContains(respuesta, f'<html lang="{codigo}">')
+
+    def testTextoFijoTraducidoEnLosPo(self):
+        # Si se agrega o cambia un {% translate %} y no se corre `py manage.py traducirtextos`, falla acá (y no hay deploy)
+        textos = textosDeLosTemplates()
+        self.assertTrue(textos, "No se encontró ningún {% translate %} en los templates")
+        for idioma in idiomasDestino():
+            with self.subTest(idioma=idioma):
+                traducciones = leerPo(rutaPo(idioma))
+                faltan = [texto for texto in textos if not traducciones.get(texto)]
+                self.assertFalse(faltan, f"Sin traducir en {rutaPo(idioma)} (correr py manage.py traducirtextos): {faltan}")
+
+    def testTraduccionesCompiladas(self):
+        # El .mo lo genera compilemessages en el CI y en el deploy. En una PC sin gettext no existe y se saltea.
+        textos = textosDeLosTemplates()
+        for idioma in idiomasDestino():
+            with self.subTest(idioma=idioma):
+                rutamo = rutaPo(idioma).with_suffix('.mo')
+                if not rutamo.exists():
+                    if os.environ.get('CI'):
+                        self.fail(f"No existe {rutamo}: falta correr compilemessages antes de los tests")
+                    self.skipTest(f"No existe {rutamo} (sin gettext en esta PC; en el CI se compila)")
+                traducciones = leerPo(rutaPo(idioma))
+                with translation.override(idioma):
+                    distintas = [texto for texto in textos if translation.gettext(texto) != traducciones.get(texto)]
+                self.assertFalse(distintas, f"El .mo de {idioma} no coincide con el .po (¿compilemessages viejo?): {distintas}")
 
 
 class SmokeEstaticosTest(TestCase):

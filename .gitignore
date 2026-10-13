@@ -22,6 +22,9 @@ venv/
 # Ignorar archivos estáticos generados por Django (collectstatic)
 staticfiles/
 
+# Ignorar traducciones compiladas (las genera compilemessages en el CI y en el deploy, a partir de los .po)
+*.mo
+
 # Ignorar archivos de configuración sensibles
 .env
 .env.*

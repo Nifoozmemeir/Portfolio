@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 
 APP_DIR=/var/www/Portfolio
-URLS_A_VERIFICAR=("https://jersdev.com/" "https://jersdev.com/admin/login/")
+URLS_A_VERIFICAR=("https://jersdev.com/" "https://jersdev.com/en/" "https://jersdev.com/pt/" "https://jersdev.com/admin/login/")
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
@@ -40,7 +40,7 @@ main() {
     commitanterior=$(git rev-parse HEAD)
     log "Commit actual: $(git log --oneline -1)"
 
-    log "1/6 Bajando código de GitHub"
+    log "1/8 Bajando código de GitHub"
     git fetch --quiet origin main
     # reset --hard: el server queda idéntico a GitHub. Cualquier edición a mano se descarta.
     git reset --hard origin/main
@@ -56,19 +56,26 @@ main() {
     }
     trap rollback ERR
 
-    log "2/6 Instalando requirements"
+    log "2/8 Instalando requirements"
     pip install --quiet -r requirements.txt
 
-    log "3/6 Chequeando settings y .env"
+    log "3/8 Chequeando settings y .env"
     python manage.py check --deploy --fail-level ERROR
 
-    log "4/6 Migraciones"
+    log "4/8 Migraciones"
     python manage.py migrate --noinput
 
-    log "5/6 Subiendo estáticos a S3"
+    log "5/8 Compilando traducciones del texto fijo (.po -> .mo, necesita gettext en el server)"
+    python manage.py compilemessages --ignore=venv
+
+    log "6/8 Traduciendo el contenido nuevo de la base (DeepL)"
+    # Solo completa lo que falte (no gasta cupo en lo ya traducido). Si DeepL no responde, avisa y sigue: esos textos se ven en español hasta el próximo deploy.
+    python manage.py traducircontenido || log "AVISO: no se pudo traducir todo el contenido (el sitio anda igual, se reintenta en el próximo deploy)"
+
+    log "7/8 Subiendo estáticos a S3"
     python manage.py collectstatic --noinput
 
-    log "6/6 Reiniciando gunicorn y verificando"
+    log "8/8 Reiniciando gunicorn y verificando"
     sudo systemctl restart gunicorn
     sleep 3
     verificarSitio

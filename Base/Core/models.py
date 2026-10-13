@@ -311,8 +311,8 @@ class ExperienceHighlightMedia(models.Model):
 
 class ExperienceSkill(models.Model):
     experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='skills')
-    name = models.CharField("Name", max_length=30, null=False, blank=False)
-    issoftskill = models.BooleanField("Is soft skill", null=False, blank=False, default=False) # Se muestra como tag verde (ej: Leadership), si no como tag de tecnología
+    name = models.CharField("Name", max_length=50, null=False, blank=False)
+    issoftskill = models.BooleanField("Is soft skill", null=False, blank=False, default=False) # Se muestra como tag verde
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -325,6 +325,11 @@ class ExperienceSkill(models.Model):
 
     def __str__(self):
         return f"{self.experience.role} - {self.name}"
+
+    # Solo las soft skills se traducen solas, las tecnologías se ven igual en todos los idiomas
+    @property
+    def esTraducible(self):
+        return self.issoftskill
 
 class ExperienceLink(models.Model):
     experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='links')

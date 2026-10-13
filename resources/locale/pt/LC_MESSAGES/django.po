@@ -1,0 +1,146 @@
+# Texto fijo de los templates en Português.
+# Lo completa `py manage.py traducirtextos` (traduce con DeepL las frases nuevas y saca las que ya no se usan).
+# Cualquier msgstr se puede corregir a mano: traducirtextos no pisa lo que ya está traducido.
+msgid ""
+msgstr ""
+"Project-Id-Version: Portfolio\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Portfolio de Julian Rosas - Full Stack Developer especializado en Django, Unity y tecnologías cloud. Creador de experiencias web y videojuegos."
+msgstr "Portfólio de Julian Rosas - Desenvolvedor Full Stack especializado em Django, Unity e tecnologias em nuvem. Criador de experiências web e videogames."
+
+msgid "Julian Rosas - Full Stack Developer y Game Designer"
+msgstr "Julian Rosas - Desenvolvedor Full Stack e Game Designer"
+
+msgid "Portfolio profesional - Desarrollo web y videojuegos"
+msgstr "Portfólio profissional - Desenvolvimento web e de jogos"
+
+msgid "Cambiar idioma"
+msgstr "Mudar idioma"
+
+msgid "Inicio"
+msgstr "Início"
+
+msgid "Sobre mí"
+msgstr "Sobre mim"
+
+msgid "Experiencia"
+msgstr "Experiência"
+
+msgid "Proyectos"
+msgstr "Projetos"
+
+msgid "Habilidades"
+msgstr "Habilidades"
+
+msgid "Contacto"
+msgstr "Contato"
+
+msgid "Mi foto"
+msgstr "Minha foto"
+
+msgid "Bienvenido a mi portfolio"
+msgstr "Bem-vindo ao meu portfólio"
+
+msgid "Hola, soy"
+msgstr "Olá, eu sou"
+
+msgid "Desarrollador Full Stack Python Django"
+msgstr "Desenvolvedor Full Stack Python Django"
+
+msgid "Desarrollador Unity C#"
+msgstr "Desenvolvedor Unity C#"
+
+msgid "Diseñador de videojuegos"
+msgstr "Designer de jogos"
+
+msgid "Entusiasta de Python"
+msgstr "Entusiasta de Python"
+
+msgid "Solucionador de problemas"
+msgstr "Solucionador de problemas"
+
+msgid "Ver proyectos"
+msgstr "Ver projetos"
+
+msgid "Contactame"
+msgstr "Fale comigo"
+
+msgid "Desarrollador apasionado de Rosario, Argentina, creando experiencias digitales desde 2023"
+msgstr "Desenvolvedor apaixonado de Rosário, Argentina, criando experiências digitais desde 2023"
+
+msgid "Imagen"
+msgstr "Imagem"
+
+msgid "Anterior"
+msgstr "Anterior"
+
+msgid "Siguiente"
+msgstr "Próximo"
+
+msgid "Dónde trabajé y dónde aprendí"
+msgstr "Onde trabalhei e onde aprendi"
+
+msgid "Presente"
+msgstr "Presente"
+
+msgid "Puesto actual"
+msgstr "Cargo atual"
+
+msgid "Lo que construí"
+msgstr "O que construí"
+
+msgid "Ver imágenes"
+msgstr "Ver imagens"
+
+msgid "Momentos"
+msgstr "Momentos"
+
+msgid "Proyectos destacados"
+msgstr "Projetos em destaque"
+
+msgid "Una selección de mis trabajos recientes en desarrollo de videojuegos y web"
+msgstr "Uma seleção dos meus trabalhos recentes em desenvolvimento de jogos e web"
+
+msgid "Todos los proyectos"
+msgstr "Todos os projetos"
+
+msgid "Habilidades y tecnologías"
+msgstr "Habilidades e tecnologias"
+
+msgid "Las herramientas y tecnologías con las que trabajo para darle vida a las ideas"
+msgstr "As ferramentas e tecnologias com as quais trabalho para dar vida às ideias"
+
+msgid "Hablemos"
+msgstr "Vamos conversar"
+
+msgid "¿Tenés un proyecto en mente? Trabajemos juntos para hacer realidad tus ideas"
+msgstr "Tem um projeto em mente? Vamos trabalhar juntos para tornar suas ideias realidade"
+
+msgid "¡Mensaje enviado con éxito!"
+msgstr "Mensagem enviada com sucesso!"
+
+msgid "Tu nombre"
+msgstr "Seu nome"
+
+msgid "Tu email"
+msgstr "Seu e-mail"
+
+msgid "Asunto"
+msgstr "Assunto"
+
+msgid "Tu mensaje"
+msgstr "Sua mensagem"
+
+msgid "Enviar mensaje"
+msgstr "Enviar mensagem"
+
+msgid "Hecho con Django y ❤️"
+msgstr "Feito com Django e ❤️"
+
+msgid "Cerrar"
+msgstr "Fechar"

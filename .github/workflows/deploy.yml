@@ -56,6 +56,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ci
       AWS_STORAGE_BUCKET_NAME: ci-bucket
       AWS_S3_REGION_NAME: us-east-1
+      DEEPL_API_KEY: ci-key-de-mentira:fx
 
     steps:
       - uses: actions/checkout@v4
@@ -65,8 +66,8 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Instalar dependencias del sistema (para compilar psycopg2)
-        run: sudo apt-get update -q && sudo apt-get install -y -q libpq-dev
+      - name: Instalar dependencias del sistema (libpq-dev para psycopg2, gettext para compilar las traducciones)
+        run: sudo apt-get update -q && sudo apt-get install -y -q libpq-dev gettext
 
       - name: Instalar requirements.txt
         run: pip install -r requirements.txt
@@ -79,6 +80,9 @@ jobs:
 
       - name: Las migraciones corren desde cero
         run: python manage.py migrate --noinput
+
+      - name: Las traducciones compilan (.po -> .mo)
+        run: python manage.py compilemessages
 
       - name: Tests de humo (ninguna página tira 500)
         run: python manage.py test --noinput -v 2

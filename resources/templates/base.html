@@ -1,20 +1,27 @@
+{% load static i18n %}
+{% get_current_language as idiomaactual %}
+{% get_available_languages as idiomas %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ idiomaactual }}">
 <head>
-    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Julián Rosas Sandillú | Portfolio{% endblock %}</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Portfolio de Julian Rosas - Full Stack Developer especializado en Django, Unity y tecnologías cloud. Creador de experiencias web y videojuegos.">
+    <meta name="description" content="{% translate 'Portfolio de Julian Rosas - Full Stack Developer especializado en Django, Unity y tecnologías cloud. Creador de experiencias web y videojuegos.' %}">
     <meta name="keywords" content="full stack developer, game developer, unity, django, python, aws, postgresql, rosario, argentina">
     <meta name="author" content="Julian Rosas Sandillú">
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Julian Rosas - Full Stack Developer & Game Designer">
-    <meta property="og:description" content="Portfolio profesional - Desarrollo web y videojuegos">
-    <meta property="og:url" content="https://jersdev.com">
+    <meta property="og:title" content="{% translate 'Julian Rosas - Full Stack Developer y Game Designer' %}">
+    <meta property="og:description" content="{% translate 'Portfolio profesional - Desarrollo web y videojuegos' %}">
+    <meta property="og:url" content="https://jersdev.com{{ request.path }}">
+    <!-- Versiones en otros idiomas (para Google) -->
+    {% for codigo, nombre in idiomas %}{% language codigo %}
+    <link rel="alternate" hreflang="{{ codigo }}" href="https://jersdev.com{% url 'home' %}">
+    {% endlanguage %}{% endfor %}
+    <link rel="alternate" hreflang="x-default" href="https://jersdev.com/">
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
@@ -25,6 +32,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <!-- Font Awesome 7 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Flag Icons (banderas SVG del selector de idioma) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" integrity="sha384-aQuvIWWIbpu/mSqULLDiUveyYiPoJzPKAWjUmGJ+Elm+N/LJhzfZqsutsfw870JS" crossorigin="anonymous">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,26 +68,32 @@
     <nav class="navbar navbar-expand-lg navbar-custom" id="navbar">
         <div class="container">
             <a class="navbar-brand" href="#home">JERSdev</a>
+            <!-- Selector de idioma -->
+            <div class="language-switcher order-lg-last" role="group" aria-label="{% translate 'Cambiar idioma' %}">
+                {% for codigo, nombre in idiomas %}{% language codigo %}
+                    <a href="{% url 'home' %}" class="language-flag {% if codigo == idiomaactual %}active{% endif %}" hreflang="{{ codigo }}" lang="{{ codigo }}" title="{{ nombre }}" aria-label="{{ nombre }}" {% if codigo == idiomaactual %}aria-current="true"{% endif %}><span class="fi fi-{% if codigo == 'en' %}gb{% else %}{{ codigo }}{% endif %}"></span></a>
+                {% endlanguage %}{% endfor %}
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#home">Home</a>
+                        <a class="nav-link active" href="#home">{% translate 'Inicio' %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
+                        <a class="nav-link" href="#about">{% translate 'Sobre mí' %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#experience">Experience</a>
+                        <a class="nav-link" href="#experience">{% translate 'Experiencia' %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#projects">Projects</a>
+                        <a class="nav-link" href="#projects">{% translate 'Proyectos' %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#skills">Skills</a>
+                        <a class="nav-link" href="#skills">{% translate 'Habilidades' %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
+                        <a class="nav-link" href="#contact">{% translate 'Contacto' %}</a>
                     </li>
                 </ul>
             </div>
@@ -89,7 +104,7 @@
         <div class="hero-bg-animation">
             <div class="floating-shapes">
                 <div class="shape">
-                    <img src="{% static 'img/Foto CV 2025.jpg' %}" alt="Mi Foto">
+                    <img src="{% static 'img/Foto CV 2025.jpg' %}" alt="{% translate 'Mi foto' %}">
                 </div>
                 <div class="shape"></div>
                 <div class="shape"></div>
@@ -97,19 +112,20 @@
         </div>
         <div class="hero-content">
             <div data-aos="fade-up" data-aos-delay="100">
-                <p class="hero-subtitle">Welcome to my portfolio</p>
+                <p class="hero-subtitle">{% translate 'Bienvenido a mi portfolio' %}</p>
             </div>
             <div data-aos="fade-up" data-aos-delay="200">
-                <h1 class="hero-title">Hi, I'm <span class="name-3d" data-text="Julian Rosas Sandillú">Julian Rosas Sandillú</span></h1>
+                <h1 class="hero-title">{% translate 'Hola, soy' %} <span class="name-3d" data-text="Julian Rosas Sandillú">Julian Rosas Sandillú</span></h1>
             </div>
             <div data-aos="fade-up" data-aos-delay="300">
                 <p class="hero-description">
-                    <span class="typing-text" id="typing-text"></span>
+                    <!-- Los textos que va escribiendo base.js, separados por | -->
+                    <span class="typing-text" id="typing-text" data-texts="{% translate 'Desarrollador Full Stack Python Django' %}|{% translate 'Desarrollador Unity C#' %}|{% translate 'Diseñador de videojuegos' %}|{% translate 'Entusiasta de Python' %}|{% translate 'Solucionador de problemas' %}"></span>
                 </p>
             </div>
             <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
-                <a href="#projects" class="btn-gradient"><i class="fa-solid fa-folder-open me-2"></i> View Projects</a>
-                <a href="#contact" class="btn-outline-gradient"><i class="fa-solid fa-envelope me-2"></i> Get In Touch</a>
+                <a href="#projects" class="btn-gradient"><i class="fa-solid fa-folder-open me-2"></i> {% translate 'Ver proyectos' %}</a>
+                <a href="#contact" class="btn-outline-gradient"><i class="fa-solid fa-envelope me-2"></i> {% translate 'Contactame' %}</a>
             </div>
             <div class="social-links" data-aos="fade-up" data-aos-delay="500">
                 <a href="https://github.com/Nifoozmemeir" class="social-link" target="_blank"><i class="fa-brands fa-github"></i></a>
@@ -127,8 +143,8 @@
     <section class="section about-section" id="about">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
-                <h2>About Me</h2>
-                <p class="section-subtitle">Passionate developer from Rosario, Argentina, creating digital experiences since 2023</p>
+                <h2>{% translate 'Sobre mí' %}</h2>
+                <p class="section-subtitle">{% translate 'Desarrollador apasionado de Rosario, Argentina, creando experiencias digitales desde 2023' %}</p>
             </div>
             <div class="row align-items-center">
                 <div class="col-lg-6" data-aos="fade-right">
@@ -137,7 +153,7 @@
                             <div id="carouselAbout" class="carousel slide rounded-3 overflow-hidden" data-bs-ride="carousel" data-bs-interval="4000">
                                 <div class="carousel-indicators">
                                     {% for img in aboutmeimages %}
-                                        <button type="button" data-bs-target="#carouselAbout" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                                        <button type="button" data-bs-target="#carouselAbout" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="{% translate 'Imagen' %} {{ forloop.counter }}"></button>
                                     {% endfor %}
                                 </div>
                                 <div class="carousel-inner">
@@ -149,11 +165,11 @@
                                 </div>
                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselAbout" data-bs-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
+                                    <span class="visually-hidden">{% translate 'Anterior' %}</span>
                                 </button>
                                 <button class="carousel-control-next" type="button" data-bs-target="#carouselAbout" data-bs-slide="next">
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
+                                    <span class="visually-hidden">{% translate 'Siguiente' %}</span>
                                 </button>
                             </div>
                         </div>
@@ -182,8 +198,8 @@
     <section class="section experience-section" id="experience">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
-                <h2>Experience</h2>
-                <p class="section-subtitle">Where I've worked and where I've learned</p>
+                <h2>{% translate 'Experiencia' %}</h2>
+                <p class="section-subtitle">{% translate 'Dónde trabajé y dónde aprendí' %}</p>
             </div>
             {% if experiencecategories %}
                 <div class="experience-tabs-wrapper" data-aos="fade-up" data-aos-delay="100">
@@ -214,8 +230,8 @@
                                             </p>
                                         </div>
                                         <div class="experience-dates-block">
-                                            <span class="experience-dates-chip"><i class="fa-solid fa-calendar"></i> {{ experience.startdate|date:"d/m/Y" }} — {% if experience.enddate %}{{ experience.enddate|date:"d/m/Y" }}{% else %}Present{% endif %}</span>
-                                            {% if not experience.enddate %}<span class="experience-current"><span class="experience-current-dot"></span>Current role</span>{% endif %}
+                                            <span class="experience-dates-chip"><i class="fa-solid fa-calendar"></i> {{ experience.startdate|date:"d/m/Y" }} — {% if experience.enddate %}{{ experience.enddate|date:"d/m/Y" }}{% else %}{% translate 'Presente' %}{% endif %}</span>
+                                            {% if not experience.enddate %}<span class="experience-current"><span class="experience-current-dot"></span>{% translate 'Puesto actual' %}</span>{% endif %}
                                         </div>
                                     </header>
                                     {% if experience.summary %}<p class="experience-summary">{{ experience.summary }}</p>{% endif %}
@@ -231,7 +247,7 @@
                                     {% endif %}
                                     {% if experience.highlights.all %}
                                         <div class="experience-block">
-                                            <h4 class="experience-block-label">What I built</h4>
+                                            <h4 class="experience-block-label">{% translate 'Lo que construí' %}</h4>
                                             <div class="experience-highlights">
                                                 {% for highlight in experience.highlights.all %}
                                                     <div class="experience-highlight">
@@ -243,7 +259,7 @@
                                                                 {% if images or urls %}
                                                                     <div class="highlight-media">
                                                                         {% if images %}
-                                                                            <button type="button" class="highlight-media-btn" data-bs-toggle="modal" data-bs-target="#highlightGallery" data-title="{{ highlight.title }}" aria-label="View images"><i class="fa-solid fa-images"></i> {{ images|length }}</button>
+                                                                            <button type="button" class="highlight-media-btn" data-bs-toggle="modal" data-bs-target="#highlightGallery" data-title="{{ highlight.title }}" aria-label="{% translate 'Ver imágenes' %}"><i class="fa-solid fa-images"></i> {{ images|length }}</button>
                                                                             <template class="highlight-gallery-items">
                                                                                 {% for media in images %}
                                                                                     <figure><img src="{{ media.image.url }}" alt="{{ media.label }}"><figcaption>{{ media.label }}</figcaption></figure>
@@ -264,7 +280,7 @@
                                     {% endif %}
                                     {% if experience.media.all %}
                                         <div class="experience-block">
-                                            <h4 class="experience-block-label">Moments</h4>
+                                            <h4 class="experience-block-label">{% translate 'Momentos' %}</h4>
                                             {% with medias=experience.media.all %}
                                             <div id="carouselExperience{{ experience.pk }}" class="carousel slide experience-media-carousel" data-bs-ride="carousel" data-bs-interval="5000">
                                                 <div class="carousel-inner">
@@ -296,13 +312,13 @@
                                                 </div>
                                                 {% if medias|length > 1 %}
                                                     <div class="experience-media-nav">
-                                                        <button type="button" class="experience-media-nav-btn" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide="prev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+                                                        <button type="button" class="experience-media-nav-btn" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide="prev" aria-label="{% translate 'Anterior' %}"><i class="fa-solid fa-chevron-left"></i></button>
                                                         <div class="carousel-indicators">
                                                             {% for media in medias %}
-                                                                <button type="button" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                                                                <button type="button" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="{% translate 'Imagen' %} {{ forloop.counter }}"></button>
                                                             {% endfor %}
                                                         </div>
-                                                        <button type="button" class="experience-media-nav-btn" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide="next" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+                                                        <button type="button" class="experience-media-nav-btn" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide="next" aria-label="{% translate 'Siguiente' %}"><i class="fa-solid fa-chevron-right"></i></button>
                                                     </div>
                                                 {% endif %}
                                             </div>
@@ -333,11 +349,11 @@
     <section class="section projects-section" id="projects">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
-                <h2>Featured Projects</h2>
-                <p class="section-subtitle">A selection of my recent work in game and web development</p>
+                <h2>{% translate 'Proyectos destacados' %}</h2>
+                <p class="section-subtitle">{% translate 'Una selección de mis trabajos recientes en desarrollo de videojuegos y web' %}</p>
             </div>
             <div class="project-filters" data-aos="fade-up" data-aos-delay="100">
-                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn active" data-filter="all">{% translate 'Todos los proyectos' %}</button>
                 {% for category in projectcategories %}
                     <button class="filter-btn" data-filter="{{ category.slug }}">{{ category.name }}</button>
                 {% endfor %}
@@ -350,7 +366,7 @@
                             <div id="carouselProject{{ project.pk }}" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-indicators">
                                     {% for media in medias %}
-                                        <button type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                                        <button type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="{% translate 'Imagen' %} {{ forloop.counter }}"></button>
                                     {% endfor %}
                                 </div>
                                 <div class="carousel-inner">
@@ -364,8 +380,8 @@
                                         </div>
                                     {% endfor %}
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">{% translate 'Anterior' %}</span></button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProject{{ project.pk }}" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">{% translate 'Siguiente' %}</span></button>
                             </div>
                         {% elif medias %}
                             {% with media=medias.0 %}
@@ -400,8 +416,8 @@
     <section class="section skills-section" id="skills">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
-                <h2>Skills & Technologies</h2>
-                <p class="section-subtitle">The tools and technologies I work with to bring ideas to life</p>
+                <h2>{% translate 'Habilidades y tecnologías' %}</h2>
+                <p class="section-subtitle">{% translate 'Las herramientas y tecnologías con las que trabajo para darle vida a las ideas' %}</p>
             </div>
             <div class="skills-grid">
                 {% for skill in skills %}
@@ -423,31 +439,31 @@
     <section class="section contact-section" id="contact">
         <div class="container">
             <div class="section-title" data-aos="fade-up">
-                <h2>Get In Touch</h2>
-                <p class="section-subtitle">Have a project in mind? Let's work together to bring your ideas to life</p>
+                <h2>{% translate 'Hablemos' %}</h2>
+                <p class="section-subtitle">{% translate '¿Tenés un proyecto en mente? Trabajemos juntos para hacer realidad tus ideas' %}</p>
             </div>
             <div class="contact-form" data-aos="fade-up" data-aos-delay="100">
-                <form id="contactForm">
+                <form id="contactForm" data-success-message="{% translate '¡Mensaje enviado con éxito!' %}">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Your Name" required>
+                                <input type="text" class="form-control" placeholder="{% translate 'Tu nombre' %}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="email" class="form-control" placeholder="Your Email" required>
+                                <input type="email" class="form-control" placeholder="{% translate 'Tu email' %}" required>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Subject" required>
+                        <input type="text" class="form-control" placeholder="{% translate 'Asunto' %}" required>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-control" placeholder="Your Message" required></textarea>
+                        <textarea class="form-control" placeholder="{% translate 'Tu mensaje' %}" required></textarea>
                     </div>
                     <div class="text-center">
-                        <button type="submit" class="btn-gradient"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+                        <button type="submit" class="btn-gradient"><i class="fa-solid fa-paper-plane"></i> {% translate 'Enviar mensaje' %}</button>
                     </div>
                 </form>
             </div>
@@ -458,12 +474,12 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-links">
-                    <a href="#home" class="footer-link">Home</a>
-                    <a href="#about" class="footer-link">About</a>
-                    <a href="#projects" class="footer-link">Projects</a>
-                    <a href="#contact" class="footer-link">Contact</a>
+                    <a href="#home" class="footer-link">{% translate 'Inicio' %}</a>
+                    <a href="#about" class="footer-link">{% translate 'Sobre mí' %}</a>
+                    <a href="#projects" class="footer-link">{% translate 'Proyectos' %}</a>
+                    <a href="#contact" class="footer-link">{% translate 'Contacto' %}</a>
                 </div>
-                <p class="footer-copy">© 2023 - 2026 Julian Rosas Sandillú. Built with Django & ❤️</p>
+                <p class="footer-copy">© 2023 - 2026 Julian Rosas Sandillú. {% translate 'Hecho con Django y ❤️' %}</p>
             </div>
         </div>
     </footer>
@@ -474,14 +490,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="highlightGalleryTitle"></h5>
-                    <button type="button" class="gallery-close" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" class="gallery-close" data-bs-dismiss="modal" aria-label="{% translate 'Cerrar' %}"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modal-body">
-                    <div id="highlightGalleryCarousel" class="carousel slide carousel-fade">
+                    <div id="highlightGalleryCarousel" class="carousel slide carousel-fade" data-slide-label="{% translate 'Imagen' %}">
                         <div class="carousel-indicators"></div>
                         <div class="carousel-inner"></div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#highlightGalleryCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#highlightGalleryCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#highlightGalleryCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">{% translate 'Anterior' %}</span></button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#highlightGalleryCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">{% translate 'Siguiente' %}</span></button>
                     </div>
                 </div>
             </div>

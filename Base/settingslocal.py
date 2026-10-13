@@ -23,6 +23,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -98,6 +100,15 @@ LANGUAGE_CODE = 'es'
 TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_TZ = True
+LANGUAGES = [
+    ('es', 'Español'),
+    ('en', 'English'),
+    ('pt', 'Português'),
+]
+LOCALE_PATHS = [os.path.join(RESOURCES_DIR, 'locale')] # Archivos de traducción del texto fijo (.po)
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'es'
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('es',) # Si un campo en EN/PT está vacío, se muestra el español
+DEEPL_API_KEY = config('DEEPL_API_KEY', default='') # API key de DeepL
 
 # Static files (CSS, JavaScript, Images) - LOCAL
 STATIC_URL = '/static/'

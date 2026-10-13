@@ -22,6 +22,7 @@ window.addEventListener('scroll', () => {
 // Active Nav Link al Scrollear
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+let currentSection = ''; // También lo usan las banderas para volver a la misma sección en el otro idioma
 window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(section => {
@@ -31,6 +32,7 @@ window.addEventListener('scroll', () => {
             current = section.getAttribute('id');
         }
     });
+    currentSection = current;
     navLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href').slice(1) === current) {
@@ -38,14 +40,16 @@ window.addEventListener('scroll', () => {
         }
     });
 });
-// Efecto de escritura
-const texts = [
-    'Python Django Full Stack Developer',
-    'Unity C# Developer',
-    'Game Designer',
-    'Python Enthusiast',
-    'Problem Solver'
-];
+// Banderas de idioma: al cambiar de idioma se vuelve a la sección donde estabas (ej: /en/#projects)
+document.querySelectorAll('.language-flag').forEach(flag => {
+    flag.addEventListener('click', () => {
+        if (currentSection && currentSection !== 'home') {
+            flag.href = flag.href.split('#')[0] + '#' + currentSection;
+        }
+    });
+});
+// Efecto de escritura: los textos vienen traducidos del template (data-texts, separados por |)
+const texts = (document.getElementById('typing-text')?.dataset.texts || '').split('|').filter(Boolean);
 let textIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -55,7 +59,7 @@ const pauseTime = 2000;
 function typeText() {
     const currentText = texts[textIndex];
     const typingElement = document.getElementById('typing-text');
-    if (!typingElement) return;
+    if (!typingElement || !texts.length) return;
     if (isDeleting) {
         typingElement.textContent = currentText.substring(0, charIndex - 1);
         charIndex--;
@@ -139,7 +143,7 @@ if (galleryModal) {
             dot.type = 'button';
             dot.dataset.bsTarget = '#highlightGalleryCarousel';
             dot.dataset.bsSlideTo = index;
-            dot.setAttribute('aria-label', `Slide ${index + 1}`);
+            dot.setAttribute('aria-label', `${galleryCarousel.dataset.slideLabel} ${index + 1}`);
             if (index === 0) {
                 dot.className = 'active';
                 dot.setAttribute('aria-current', 'true');
@@ -205,7 +209,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 document.getElementById('contactForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     // Aquí agregar la lógica para enviar el formulario
-    alert('Message sent successfully!');
+    alert(this.dataset.successMessage);
     this.reset();
 });
 // Cursor custom

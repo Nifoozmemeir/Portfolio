@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
+from modeltranslation.admin import TabbedTranslationAdmin
 from .models import *
 
-class AboutMeContentAdmin(admin.ModelAdmin):
+class AboutMeContentAdmin(TabbedTranslationAdmin):
     list_display = ('header', 'id')
     search_fields = ('header',)
     readonly_fields = ('created_at', 'updated_at')
@@ -12,25 +13,25 @@ class AboutMeContentAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-class AboutMeStatAdmin(admin.ModelAdmin):
+class AboutMeStatAdmin(TabbedTranslationAdmin):
     list_display = ('value', 'label', 'id', 'order')
     search_fields = ('label',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
-class AboutMeImageAdmin(admin.ModelAdmin):
+class AboutMeImageAdmin(TabbedTranslationAdmin):
     list_display = ('description', 'id', 'order')
     search_fields = ('description',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
-class ProjectCategoryAdmin(admin.ModelAdmin):
+class ProjectCategoryAdmin(TabbedTranslationAdmin):
     list_display = ('name', 'id', 'slug', 'order')
     search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'id', 'category', 'order')
     list_filter = (('category', RelatedDropdownFilter),)
     list_select_related = ('category',)
@@ -39,7 +40,7 @@ class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
-class ProjectImageAdmin(admin.ModelAdmin):
+class ProjectImageAdmin(TabbedTranslationAdmin):
     list_display = ('description', 'id', 'project', 'isVideo', 'order')
     list_filter = (('project', RelatedDropdownFilter),)
     list_select_related = ('project',)
@@ -57,7 +58,7 @@ class ProjectTagAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('project', 'order')
 
-class ProjectLinkAdmin(admin.ModelAdmin):
+class ProjectLinkAdmin(TabbedTranslationAdmin):
     list_display = ('label', 'id', 'project', 'url', 'order')
     list_filter = (('project', RelatedDropdownFilter),)
     list_select_related = ('project',)
@@ -66,7 +67,7 @@ class ProjectLinkAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('project', 'order')
 
-class SkillLevelAdmin(admin.ModelAdmin):
+class SkillLevelAdmin(TabbedTranslationAdmin):
     list_display = ('name', 'id', 'order')
     search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
@@ -81,13 +82,13 @@ class SkillAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
-class ExperienceCategoryAdmin(admin.ModelAdmin):
+class ExperienceCategoryAdmin(TabbedTranslationAdmin):
     list_display = ('name', 'id', 'slug', 'icon', 'order')
     search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
-class ExperienceAdmin(admin.ModelAdmin):
+class ExperienceAdmin(TabbedTranslationAdmin):
     list_display = ('role', 'id', 'organization', 'category', 'startdate', 'enddate', 'order')
     list_filter = (('category', RelatedDropdownFilter),)
     list_select_related = ('category',)
@@ -96,7 +97,7 @@ class ExperienceAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('category', 'order')
 
-class ExperienceMetricAdmin(admin.ModelAdmin):
+class ExperienceMetricAdmin(TabbedTranslationAdmin):
     list_display = ('value', 'label', 'id', 'experience', 'order')
     list_filter = (('experience', RelatedDropdownFilter),)
     list_select_related = ('experience',)
@@ -105,7 +106,7 @@ class ExperienceMetricAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('experience', 'order')
 
-class ExperienceHighlightAdmin(admin.ModelAdmin):
+class ExperienceHighlightAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'id', 'experience', 'icon', 'order')
     list_filter = (('experience', RelatedDropdownFilter),)
     list_select_related = ('experience',)
@@ -114,7 +115,7 @@ class ExperienceHighlightAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('experience', 'order')
 
-class ExperienceHighlightMediaAdmin(admin.ModelAdmin):
+class ExperienceHighlightMediaAdmin(TabbedTranslationAdmin):
     list_display = ('label', 'id', 'highlight', 'url', 'order')
     list_filter = (('highlight', RelatedDropdownFilter),)
     list_select_related = ('highlight__experience',)
@@ -123,7 +124,7 @@ class ExperienceHighlightMediaAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('highlight', 'order')
 
-class ExperienceSkillAdmin(admin.ModelAdmin):
+class ExperienceSkillAdmin(TabbedTranslationAdmin):
     list_display = ('name', 'id', 'experience', 'issoftskill', 'order')
     list_filter = (('experience', RelatedDropdownFilter), ('issoftskill', DropdownFilter))
     list_select_related = ('experience',)
@@ -132,7 +133,7 @@ class ExperienceSkillAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('experience', 'order')
 
-class ExperienceLinkAdmin(admin.ModelAdmin):
+class ExperienceLinkAdmin(TabbedTranslationAdmin):
     list_display = ('label', 'id', 'experience', 'url', 'order')
     list_filter = (('experience', RelatedDropdownFilter),)
     list_select_related = ('experience',)
@@ -141,7 +142,7 @@ class ExperienceLinkAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('experience', 'order')
 
-class ExperienceMediaAdmin(admin.ModelAdmin):
+class ExperienceMediaAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'id', 'experience', 'isVideo', 'url', 'order')
     list_filter = (('experience', RelatedDropdownFilter),)
     list_select_related = ('experience',)

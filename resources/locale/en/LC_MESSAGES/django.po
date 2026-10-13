@@ -1,0 +1,146 @@
+# Texto fijo de los templates en English.
+# Lo completa `py manage.py traducirtextos` (traduce con DeepL las frases nuevas y saca las que ya no se usan).
+# Cualquier msgstr se puede corregir a mano: traducirtextos no pisa lo que ya está traducido.
+msgid ""
+msgstr ""
+"Project-Id-Version: Portfolio\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Portfolio de Julian Rosas - Full Stack Developer especializado en Django, Unity y tecnologías cloud. Creador de experiencias web y videojuegos."
+msgstr "Julian Rosas's portfolio - Full Stack Developer specialized in Django, Unity and cloud technologies. Creator of web experiences and video games."
+
+msgid "Julian Rosas - Full Stack Developer y Game Designer"
+msgstr "Julian Rosas - Full Stack Developer & Game Designer"
+
+msgid "Portfolio profesional - Desarrollo web y videojuegos"
+msgstr "Professional portfolio - Web and game development"
+
+msgid "Cambiar idioma"
+msgstr "Change language"
+
+msgid "Inicio"
+msgstr "Home"
+
+msgid "Sobre mí"
+msgstr "About Me"
+
+msgid "Experiencia"
+msgstr "Experience"
+
+msgid "Proyectos"
+msgstr "Projects"
+
+msgid "Habilidades"
+msgstr "Skills"
+
+msgid "Contacto"
+msgstr "Contact"
+
+msgid "Mi foto"
+msgstr "My photo"
+
+msgid "Bienvenido a mi portfolio"
+msgstr "Welcome to my portfolio"
+
+msgid "Hola, soy"
+msgstr "Hi, I'm"
+
+msgid "Desarrollador Full Stack Python Django"
+msgstr "Python Django Full Stack Developer"
+
+msgid "Desarrollador Unity C#"
+msgstr "Unity C# Developer"
+
+msgid "Diseñador de videojuegos"
+msgstr "Game Designer"
+
+msgid "Entusiasta de Python"
+msgstr "Python Enthusiast"
+
+msgid "Solucionador de problemas"
+msgstr "Problem Solver"
+
+msgid "Ver proyectos"
+msgstr "View Projects"
+
+msgid "Contactame"
+msgstr "Get In Touch"
+
+msgid "Desarrollador apasionado de Rosario, Argentina, creando experiencias digitales desde 2023"
+msgstr "Passionate developer from Rosario, Argentina, creating digital experiences since 2023"
+
+msgid "Imagen"
+msgstr "Slide"
+
+msgid "Anterior"
+msgstr "Previous"
+
+msgid "Siguiente"
+msgstr "Next"
+
+msgid "Dónde trabajé y dónde aprendí"
+msgstr "Where I've worked and where I've learned"
+
+msgid "Presente"
+msgstr "Present"
+
+msgid "Puesto actual"
+msgstr "Current role"
+
+msgid "Lo que construí"
+msgstr "What I built"
+
+msgid "Ver imágenes"
+msgstr "View images"
+
+msgid "Momentos"
+msgstr "Moments"
+
+msgid "Proyectos destacados"
+msgstr "Featured Projects"
+
+msgid "Una selección de mis trabajos recientes en desarrollo de videojuegos y web"
+msgstr "A selection of my recent work in game and web development"
+
+msgid "Todos los proyectos"
+msgstr "All Projects"
+
+msgid "Habilidades y tecnologías"
+msgstr "Skills & Technologies"
+
+msgid "Las herramientas y tecnologías con las que trabajo para darle vida a las ideas"
+msgstr "The tools and technologies I work with to bring ideas to life"
+
+msgid "Hablemos"
+msgstr "Get In Touch"
+
+msgid "¿Tenés un proyecto en mente? Trabajemos juntos para hacer realidad tus ideas"
+msgstr "Have a project in mind? Let's work together to bring your ideas to life"
+
+msgid "¡Mensaje enviado con éxito!"
+msgstr "Message sent successfully!"
+
+msgid "Tu nombre"
+msgstr "Your Name"
+
+msgid "Tu email"
+msgstr "Your Email"
+
+msgid "Asunto"
+msgstr "Subject"
+
+msgid "Tu mensaje"
+msgstr "Your Message"
+
+msgid "Enviar mensaje"
+msgstr "Send Message"
+
+msgid "Hecho con Django y ❤️"
+msgstr "Built with Django & ❤️"
+
+msgid "Cerrar"
+msgstr "Close"
