@@ -124,6 +124,12 @@ msgstr "Tem um projeto em mente? Vamos trabalhar juntos para tornar suas ideias 
 msgid "¡Mensaje enviado con éxito!"
 msgstr "Mensagem enviada com sucesso!"
 
+msgid "No se pudo enviar el mensaje, probá de nuevo en un rato."
+msgstr "Não foi possível enviar a mensagem; tente novamente daqui a algum tempo."
+
+msgid "Mandaste varios mensajes seguidos, probá de nuevo más tarde."
+msgstr "Enviou várias mensagens seguidas; tente novamente mais tarde."
+
 msgid "Tu nombre"
 msgstr "Seu nome"
 

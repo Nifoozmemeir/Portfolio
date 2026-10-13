@@ -388,3 +388,22 @@ class ExperienceMedia(models.Model):
     @property
     def urlDomain(self):
         return urlparse(self.url).netloc.removeprefix('www.')
+
+class ContactMessage(models.Model):
+    name = models.CharField("Name", max_length=100, null=False, blank=False)
+    email = models.EmailField("Email", max_length=254, null=False, blank=False) # Va como Reply-To del email, nunca como remitente (si no, cae en spam)
+    subject = models.CharField("Subject", max_length=150, null=False, blank=False)
+    message = models.TextField("Message", null=False, blank=False)
+    issent = models.BooleanField("Is sent", null=False, blank=False, default=False) # Lo marca la tarea de Celery cuando SES aceptó el email
+
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Contact - Message'
+        verbose_name_plural = 'Contact - Messages'
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"

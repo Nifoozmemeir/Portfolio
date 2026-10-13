@@ -39,6 +39,15 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      # La cache (contadores anti-spam del form de contacto) es Redis
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     # Variables de mentira con los mismos nombres que el .env del server.
     # Si agregás un config('ALGO') nuevo al settings y no lo sumás acá, el CI falla:
@@ -57,6 +66,11 @@ jobs:
       AWS_STORAGE_BUCKET_NAME: ci-bucket
       AWS_S3_REGION_NAME: us-east-1
       DEEPL_API_KEY: ci-key-de-mentira:fx
+      CELERY_TASK_ALWAYS_EAGER: "True" # Sin worker en el CI: las tareas corren en el momento
+      EMAIL_HOST_USER: ci
+      EMAIL_HOST_PASSWORD: ci
+      DEFAULT_FROM_EMAIL: "JERSdev <ci@test.com>"
+      CONTACT_EMAIL: ci@test.com
 
     steps:
       - uses: actions/checkout@v4

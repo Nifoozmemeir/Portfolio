@@ -50,7 +50,7 @@ main() {
         log "ROLLBACK: volviendo a $commitanterior"
         git reset --hard "$commitanterior"
         pip install --quiet -r requirements.txt
-        sudo systemctl restart gunicorn
+        sudo systemctl restart gunicorn celery
         log "Código restaurado. Ojo: si una migración nueva ya se aplicó, la base NO vuelve atrás sola."
         exit 1
     }
@@ -75,10 +75,14 @@ main() {
     log "7/8 Subiendo estáticos a S3"
     python manage.py collectstatic --noinput
 
-    log "8/8 Reiniciando gunicorn y verificando"
-    sudo systemctl restart gunicorn
+    log "8/8 Reiniciando gunicorn y celery y verificando"
+    sudo systemctl restart gunicorn celery
     sleep 3
     verificarSitio
+    # Si redis o celery no están corriendo, el form de contacto no manda emails: dispara el rollback
+    systemctl is-active --quiet redis-server
+    systemctl is-active --quiet celery
+    log "OK: redis y celery corriendo"
 
     trap - ERR
 

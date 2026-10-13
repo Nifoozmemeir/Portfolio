@@ -1104,6 +1104,14 @@ body {
     max-width: 700px;
     margin: 0 auto;
 }
+/* Honeypot del form: fuera de pantalla para personas, los bots lo llenan igual */
+.contact-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
 .form-group {
     margin-bottom: 25px;
 }

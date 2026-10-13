@@ -205,12 +205,26 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
-// Form de contact
-document.getElementById('contactForm')?.addEventListener('submit', function(e) {
+// Form de contact: lo manda por fetch, el email lo envía Celery en segundo plano
+document.getElementById('contactForm')?.addEventListener('submit', async function (e) {
     e.preventDefault();
-    // Aquí agregar la lógica para enviar el formulario
-    alert(this.dataset.successMessage);
-    this.reset();
+    const boton = this.querySelector('button[type="submit"]');
+    boton.disabled = true; // Evita doble envío mientras espera la respuesta
+    try {
+        const respuesta = await fetch(this.action, { method: 'POST', body: new FormData(this) });
+        if (respuesta.status === 429) {
+            alert(this.dataset.limitMessage);
+            return;
+        }
+        if (!respuesta.ok) throw new Error(respuesta.status);
+        alert(this.dataset.successMessage);
+        this.reset();
+    } catch (err) {
+        console.warn('No se pudo enviar el form de contacto:', err);
+        alert(this.dataset.errorMessage);
+    } finally {
+        boton.disabled = false;
+    }
 });
 // Cursor custom
 const cursor = document.getElementById('cursor');

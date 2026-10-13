@@ -141,17 +141,33 @@ Portfolio personal en **Django 5.2**, **Python 3.12.3** (venv `myvenv`). Postgre
 
 - Paquete del proyecto: `Base/` → [Base/settingslocal.py](Base/settingslocal.py), [Base/settingsproduction.py](Base/settingsproduction.py), [Base/storagemedia.py](Base/storagemedia.py).
 - `storagemedia.py`: `MediaStorageDev` sube a `media-dev/` y `MediaStorageProd` a `media/`. Static se sirve de disco en dev (`StaticFilesStorage`) y desde S3 en producción (`S3Boto3Storage`, prefijo `static/`).
-- Cada máquina tiene su propio `.env`; [.env.example](.env.example) es la plantilla con todos los nombres (bloques LOCAL, PROD y AWS). Variable nueva → se agrega ahí también.
-- App única: `Base/Core` (label `Base.Core` en `INSTALLED_APPS`, `ROOT_URLCONF` y `AppConfig.name`). [Base/urls.py](Base/urls.py) monta `/admin/` y delega el resto a [Base/Core/urls.py](Base/Core/urls.py).
+- Cada máquina tiene su propio `.env`; [.env.example](.env.example) es la plantilla con todos los nombres (bloques LOCAL, PROD, AWS, DeepL y Email/Celery/Redis). Variable nueva → se agrega ahí también.
+- App única: `Base/Core` (label `Base.Core` en `INSTALLED_APPS`, `ROOT_URLCONF` y `AppConfig.name`). [Base/urls.py](Base/urls.py) monta `/admin/` y delega el resto a [Base/Core/urls.py](Base/Core/urls.py) dentro de `i18n_patterns` (`/` español sin prefijo, `/en/` inglés, `/pt/` portugués).
+
+### Idiomas (es / en / pt)
+
+- **Contenido de la base:** `django-modeltranslation` ([Base/Core/translation.py](Base/Core/translation.py)). Se carga solo en español; al guardar, `traducirAlGuardar` ([Base/Core/traduccion.py](Base/Core/traduccion.py)) completa inglés y portugués con DeepL (`DEEPL_API_KEY`). Lo que falte lo completa `traducircontenido` en cada deploy.
+- **Texto fijo de los templates** (`{% translate '...' %}`): vive en `resources/locale/<idioma>/LC_MESSAGES/django.po`. No se usa `makemessages`: después de agregar o cambiar un `{% translate %}` se corre `py manage.py traducirtextos`, que traduce lo nuevo con DeepL y saca lo que ya no se usa (respeta correcciones a mano). Si no se corre, los tests fallan.
+- **Los `.mo` no se commitean** (`*.mo` en `.gitignore`): los compilan el CI y `deploy.sh` con `compilemessages`. En Windows no hay gettext, así que en local se compilan con el de WSL (ver Comandos); si el `.mo` local quedó viejo, `testTraduccionesCompiladas` falla solo en la PC.
+
+### Form de contacto: Celery + Redis + AWS SES
+
+- POST por `fetch` a la view `contact` ([Base/Core/views.py](Base/Core/views.py)), validado con `ContactMessageForm` ([Base/Core/forms.py](Base/Core/forms.py)). El HTML del form está escrito a mano en `base.html`: el Django Form solo valida en el back, nunca se renderiza con `{{ form }}` ni hay sticky forms.
+- Defensas anti-bots: honeypot (`website`), trampa de tiempo (token firmado, mínimo `SEGUNDOS_MINIMOS`) y límites en Redis (`LIMITE_POR_IP` por hora, `LIMITE_DIARIO` en total). A un bot se le responde `ok` sin guardar nada.
+- Guarda el `ContactMessage` (queda siempre en el admin) y encola `enviarEmailContacto` ([Base/Core/tasks.py](Base/Core/tasks.py)), que manda por SES con From `DEFAULT_FROM_EMAIL`, To `CONTACT_EMAIL` y **Reply-To el email del visitante (nunca como remitente)**, y marca `issent`. Si SES falla, Celery reintenta 5 veces con backoff.
+- Redis: base 0 = cola de Celery (`CELERY_BROKER_URL`), base 1 = cache (`REDIS_CACHE_URL`, contadores de límite). La app de Celery está en [Base/celery.py](Base/celery.py).
+- La IP del visitante sale de `X-Real-IP`, que pone nginx (`include proxy_params`); gunicorn escucha en un socket unix, sin ese header no hay IP.
 
 ### Pipeline (jersdev.com en AWS Lightsail)
 
 Cada push a `main` (o "Run workflow" a mano en Actions) dispara [.github/workflows/deploy.yml](.github/workflows/deploy.yml):
 
-1. **Job `test`** (ubuntu-24.04, Python 3.12, Postgres 16 como service, `DJANGO_SETTINGS_MODULE=Base.settingsproduction` con variables de mentira): `pip install -r requirements.txt` → `check --deploy --fail-level ERROR` → `makemigrations --check --dry-run` → `migrate` desde cero → `manage.py test`.
+1. **Job `test`** (ubuntu-24.04, Python 3.12, Postgres 16 y Redis 7 como services, `DJANGO_SETTINGS_MODULE=Base.settingsproduction` con variables de mentira y `CELERY_TASK_ALWAYS_EAGER=True`, sin worker): `apt-get` de `libpq-dev` y `gettext` → `pip install -r requirements.txt` → `check --deploy --fail-level ERROR` → `makemigrations --check --dry-run` → `migrate` desde cero → `compilemessages` → `manage.py test`.
 2. **Job `deploy`** (solo si pasó `test`): entra por SSH (secrets `SSH_KEY`, `SSH_HOST`, `SSH_USER`) y corre la versión de [deploy.sh](deploy.sh) que está en `origin/main`.
 
-[deploy.sh](deploy.sh) en `/var/www/Portfolio` (venv `venv/`): `git reset --hard origin/main` → `pip install` → `check --deploy` → `migrate` → `collectstatic` (a S3) → `systemctl restart gunicorn` → verifica que `/` y `/admin/login/` respondan 200 → `limpiarestaticos` (comando propio en `Base/Core/management/commands/`: borra de `static/` en S3 todo lo que no figura en `staticfiles.json`, o sea versiones viejas con hash y archivos sacados del código; si falla solo avisa). Si algo falla antes de la verificación, rollback automático al commit anterior (la base no vuelve atrás).
+[deploy.sh](deploy.sh) en `/var/www/Portfolio` (venv `venv/`): `git reset --hard origin/main` → `pip install` → `check --deploy` → `migrate` → `compilemessages` → `traducircontenido` (DeepL; si falla solo avisa) → `collectstatic` (a S3) → `systemctl restart gunicorn celery` → verifica que `URLS_A_VERIFICAR` (`/`, `/en/`, `/pt/`, `/admin/login/`) respondan 200 y que `redis-server` y `celery` estén activos → `limpiarestaticos` (comando propio en `Base/Core/management/commands/`: borra de `static/` en S3 todo lo que no figura en `staticfiles.json`, o sea versiones viejas con hash y archivos sacados del código; si falla solo avisa). Si algo falla antes de la verificación, rollback automático al commit anterior, reiniciando gunicorn y celery (la base no vuelve atrás).
+
+Servicios del server (Ubuntu 24.04, usuario `ubuntu`): nginx (`/etc/nginx/sites-enabled/portfolio`, certbot) → gunicorn (`gunicorn.service`, socket unix `portfolio.sock`); `redis-server` (apt, solo escucha en `127.0.0.1`); `celery.service` (`venv/bin/celery -A Base worker --concurrency=1`, mismo usuario/grupo y `DJANGO_SETTINGS_MODULE` que gunicorn). Los units de systemd y la instalación de Redis se hicieron a mano en el server y **no están en el repo** (pendiente para cumplir "nada de pasos manuales").
 
 Qué revisar en cada cambio para no romperlo:
 
@@ -159,7 +175,8 @@ Qué revisar en cada cambio para no romperlo:
 - **Cambio en models** → el CI corre `makemigrations --check`: si falta la migración, falla. Avisar al usuario que tiene que generarla antes de pushear (las migraciones las hace él).
 - **Paquete nuevo** → en `requirements.txt` con versión fija; si necesita librerías del sistema para compilar, agregar el `apt-get` en `deploy.yml` y avisar que también hay que instalarlo en el server.
 - **URL o página nueva** → que no rompa con la base vacía (los tests corren sin datos). Si la home cambia de ruta o se agrega una página crítica, actualizar `URLS_A_VERIFICAR` en `deploy.sh`.
-- **`URLS_VIEJAS`** en `tests.py` es **momentáneo**: las URLs viejas que, si tiran 500, solo dan warning y no cortan el deploy. Se mantiene así **hasta que el usuario diga lo contrario**; no vaciarla ni quitar la excepción por iniciativa propia (ni siquiera al borrar las vistas viejas). Cuando lo pida, se elimina el mecanismo y toda URL que tire 500 corta el pipeline, sin excepciones. Nunca sumar URLs nuevas a esa lista para esquivar un fallo.
+- **Toda URL que tire 500 corta el pipeline, sin excepciones.** No hay lista de URLs toleradas; no crear una para esquivar un fallo.
+- **Servicio nuevo en el server** (otro worker, otro unit de systemd) → sumarlo al `restart` y a la verificación de `deploy.sh` (y al `rollback`), y avisar al usuario que lo cree en el server antes de pushear: si no existe, el deploy hace rollback.
 - Cualquier edición a mano en el server se pisa con el `reset --hard`: todo cambio va por el repo.
 - **Estáticos versionados en producción** (`S3ManifestStaticStorage`): cada estático está dos veces en `static/` del bucket, el original (`base.css`) y el versionado (`base.<hash>.css`). La página usa **solo el versionado**, según `static/staticfiles.json`. Las versiones viejas las borra solo `limpiarestaticos` en cada deploy, así que nunca se acumulan. En `static/` no se borra nada a mano: si se borra un versionado, ese archivo da 404 hasta volver a correr `collectstatic` (Actions → "CI/CD" → Run workflow). En local no aplica: con `DEBUG = True` se sirven sin hash.
 
@@ -174,14 +191,21 @@ pip install -r requirements.txt
 ```
 
 ```sh
-py manage.py test               # tests de humo (Base/Core/tests.py), los mismos que corre el CI
+py manage.py test               # tests de humo (Base/Core/tests.py), los mismos que corre el CI. Necesita Redis arriba
+py manage.py traducirtextos     # después de agregar/cambiar un {% translate %}
+wsl msgfmt -o resources/locale/en/LC_MESSAGES/django.mo resources/locale/en/LC_MESSAGES/django.po   # compilar el .mo en local (ídem con pt)
+celery -A Base worker -l info --pool=solo   # worker local para probar el envío real (en Windows va --pool=solo)
 ```
+
+Redis local corre en WSL (Ubuntu 24.04) como servicio, en `127.0.0.1:6379`; arranca solo al abrir Ubuntu (`redis-cli ping` → `PONG`). Los tests usan esa misma Redis y `SmokeContactoTest` le hace `cache.clear()` a la base 1.
+
+Al darle comandos al usuario, decir siempre **en qué terminal** va cada uno: Bash del venv en VS Code (Git Bash, `(myvenv)`), Ubuntu de WSL (Redis) o SSH del server.
 
 Migraciones: solo cuando el usuario lo pide. No hay linter/formatter configurado.
 
 ### Foco actual: reestructuración
 
-- **`base.html` es el home y LA base.** Todo el sitio (hero, about, projects, skills, experience, contact, footer) en una sola página con anclas. La única vista vigente es `Home` (`/`) → `base.html`.
+- **`base.html` es el home y LA base.** Todo el sitio (hero, about, projects, skills, experience, contact, footer) en una sola página con anclas. Las únicas vistas son `home` (`/`) → `base.html` y `contact` (POST del form, responde JSON). No queda nada del sitio viejo: si hace falta otra página, se crea con su trío y su vista nueva.
 - **Diseño:** sale de `base.html` + [resources/static/css/base.css](resources/static/css/base.css) y se replica en todo el resto. Tokens en `:root` de `base.css`:
   `--primary-color: #667eea`, `--secondary-color: #764ba2`, `--dark-bg: #0a0e27`, `--darker-bg: #040613`, `--light-text: #e2e8f0`, `--muted-text: #94a3b8`, `--accent-color: #f59e0b`, `--success-color: #10b981`, `--navbar-height: 70px`, `--photo-ratio: 1600 / 739`, `--about-photo-ratio: 4 / 3`.
   Usar siempre estas variables, nunca hardcodear un color nuevo.
@@ -196,20 +220,16 @@ Migraciones: solo cuando el usuario lo pide. No hay linter/formatter configurado
 - **`return render(...)` siempre en una sola línea**, con el contexto inline, por más largo que quede.
 - **Nunca dejar un N+1.** Si el template accede a una relación (`{{ obj.fk.campo }}`, `{% for x in obj.hijos.all %}`), la vista la trae de antemano: `select_related()` para FK, `prefetch_related()` para inversas y M2M. Vale también al sumar un campo relacionado a un template existente.
 - **Nada de `help_text`.** Las aclaraciones van como comentario `#` en la misma línea del campo (ver "`models.py`" en la Parte 1); si le sirven al usuario en el admin, van en el `verbose_name` (primer argumento posicional).
-- **Emails con Redis + Celery, a futuro.** Hoy no hay nada instalado; no agregarlo hasta que se pida.
+- **Emails siempre por Celery** (ver "Form de contacto"): la view guarda y encola con `.delay(pk)` (solo el id), la tarea lee de la base y es idempotente. Nunca mandar un email dentro del request.
 
 ### Patrones de models/admin
 
 - **Singleton para contenido único** (ej. `AboutMeContent`): `save()` fuerza `pk=1`, expone `load()` (get-or-create); en el admin `has_add_permission` da `False` si ya existe y `has_delete_permission` siempre `False`.
 - **Colección ordenada para listas** (ej. `AboutMeStat`, `AboutMeImage`): campo `order` (`PositiveIntegerField`) con `ordering = ('order',)`.
 - Los hijos de `Project` (`ProjectImage`, `ProjectTag`, `ProjectLink`) tienen su propio admin, con el proyecto por `raw_id_fields` y filtro dropdown; no son inlines.
-- Todo el contenido se administra desde `/admin/`; no hay forms ni CRUD públicos.
+- Todo el contenido se administra desde `/admin/`; no hay CRUD público. El único form público es el de contacto, y sus mensajes (`ContactMessage`) son de solo lectura en el admin (`has_add_permission` → `False`, todos los campos en `readonly_fields`).
 
-### Cosas viejas (no tocar, se borran más adelante)
+### Pendientes conocidos
 
-Siguen ruteadas pero no hay que arreglarlas, mantenerlas ni migrarlas:
-
-- Vistas `Index`, `AboutMe`, `SpaceCommanderInfo`, `GemsCrawlerInfo`, `FinalProjectInfo` en [Base/Core/views.py](Base/Core/views.py).
-- URLs `portfolio`, `about-me`, `space-commander-seu`, `gems-crawler`, `final-project` en [Base/Core/urls.py](Base/Core/urls.py).
-- Todo `resources/static/img/` (imágenes viejas como static; la excepción a la regla de S3).
-- Todos los templates de `resources/templates/` menos `base.html`.
+- `resources/static/img/Foto CV 2025.jpg`: la foto del hero sigue como static, en contra de la regla de S3. Hay que pasarla a un `ImageField` (por ejemplo en `AboutMeContent`) y borrar la carpeta `img/`.
+- Units de systemd (`celery.service`) e instalación de Redis del server fuera del repo (ver "Pipeline").

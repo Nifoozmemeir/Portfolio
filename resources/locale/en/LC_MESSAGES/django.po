@@ -124,6 +124,12 @@ msgstr "Have a project in mind? Let's work together to bring your ideas to life"
 msgid "¡Mensaje enviado con éxito!"
 msgstr "Message sent successfully!"
 
+msgid "No se pudo enviar el mensaje, probá de nuevo en un rato."
+msgstr "The message could not be sent; please try again in a little while."
+
+msgid "Mandaste varios mensajes seguidos, probá de nuevo más tarde."
+msgstr "You sent several messages in quick succession; please try again later."
+
 msgid "Tu nombre"
 msgstr "Your Name"
 

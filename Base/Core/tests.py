@@ -13,29 +13,23 @@ import io
 import json
 import os
 import tempfile
+import time
 
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.core import mail, signing
+from django.core.cache import cache
 from django.core.management import call_command
 from django.template.loader import get_template
 from django.test import Client, TestCase, override_settings
 from django.urls import URLPattern, URLResolver, get_resolver, reverse
 from django.utils import translation
 
+from Base.celery import app
+from Base.Core.models import ContactMessage
 from Base.Core.traduccion import idiomasDestino, leerPo, rutaPo, textosDeLosTemplates
 
-
-# URLs viejas que se van con el revamp (paso 3). Si tiran 500 NO cortan el pipeline:
-# aparecen como warning amarillo en GitHub Actions y el deploy sigue.
-# Cuando termines el revamp, vaciá esta lista y quedan todas obligatorias.
-URLS_VIEJAS = [
-    '/portfolio',
-    '/about-me',
-    '/space-commander-seu',
-    '/gems-crawler',
-    '/final-project',
-]
 
 # Estáticos sin versionar para los tests comunes: con estáticos versionados (manifest),
 # {% static %} necesita que antes se haya corrido collectstatic. Eso lo prueba aparte SmokeEstaticosTest.
@@ -57,17 +51,13 @@ def urlsPublicas(resolver=None, prefijo=''):
 
 
 def chequearUrlsPublicas(test):
-    """Pide todas las URLs públicas y falla si alguna tira 500 (las de URLS_VIEJAS solo avisan)."""
+    """Pide todas las URLs públicas y falla si alguna tira 500, sin excepciones."""
     # raise_request_exception=False: si la vista explota, devuelve un 500 en vez de cortar el test
     cliente = Client(raise_request_exception=False)
     for url in urlsPublicas():
         with test.subTest(url=url):
             # secure=True: en producción SECURE_SSL_REDIRECT manda todo a HTTPS
             respuesta = cliente.get(url, secure=True, follow=True)
-            if respuesta.status_code >= 500 and url in URLS_VIEJAS:
-                # Formato que GitHub Actions muestra como warning amarillo
-                print(f"::warning title=URL vieja rota::{url} devuelve {respuesta.status_code} (está en URLS_VIEJAS, no corta el pipeline)")
-                continue
             test.assertLess(respuesta.status_code, 500, f"{url} devolvió {respuesta.status_code}")
 
 
@@ -163,6 +153,49 @@ class SmokeIdiomasTest(TestCase):
                 with translation.override(idioma):
                     distintas = [texto for texto in textos if translation.gettext(texto) != traducciones.get(texto)]
                 self.assertFalse(distintas, f"El .mo de {idioma} no coincide con el .po (¿compilemessages viejo?): {distintas}")
+
+
+@override_settings(STORAGES=STORAGES_SIN_MANIFEST, CELERY_TASK_ALWAYS_EAGER=True)
+class SmokeContactoTest(TestCase):
+    """
+    Form de contacto de punta a punta: view -> Celery (eager, sin worker) -> email, con las defensas anti-bots.
+    Necesita Redis arriba: la cache (contadores de límite) es Redis.
+    """
+
+    def setUp(self):
+        cache.clear() # Los contadores de límite viven en Redis y sobreviven entre tests
+        # Celery lee su config una sola vez al arrancar: el override_settings no le llega, hay que tocar la app directo
+        self.eageranterior = app.conf.task_always_eager
+        app.conf.task_always_eager = True
+        self.datos = {'name': 'Visita', 'email': 'visita@test.com', 'subject': 'Hola', 'message': 'Mensaje de prueba', 'website': '', 'token': signing.dumps(time.time() - 10, salt='contacto')}
+
+    def tearDown(self):
+        app.conf.task_always_eager = self.eageranterior
+
+    def testMensajeValidoSeGuardaYSeMandaElEmail(self):
+        respuesta = self.client.post(reverse('contact'), self.datos, secure=True)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertTrue(ContactMessage.objects.get().issent)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].reply_to, ['visita@test.com'])
+
+    def testMensajeInvalidoDevuelve400(self):
+        respuesta = self.client.post(reverse('contact'), {**self.datos, 'email': 'no-es-email'}, secure=True)
+        self.assertEqual(respuesta.status_code, 400)
+
+    def testBotsNoGuardanNiMandan(self):
+        self.client.post(reverse('contact'), {**self.datos, 'website': 'spam.com'}, secure=True)
+        self.client.post(reverse('contact'), {**self.datos, 'token': signing.dumps(time.time(), salt='contacto')}, secure=True)
+        self.client.post(reverse('contact'), {**self.datos, 'token': 'inventado'}, secure=True)
+        self.assertFalse(ContactMessage.objects.exists())
+        self.assertEqual(len(mail.outbox), 0)
+
+    def testLimitePorIpDevuelve429(self):
+        for _ in range(3):
+            self.client.post(reverse('contact'), self.datos, secure=True)
+        respuesta = self.client.post(reverse('contact'), self.datos, secure=True)
+        self.assertEqual(respuesta.status_code, 429)
+        self.assertEqual(ContactMessage.objects.count(), 3)
 
 
 class SmokeEstaticosTest(TestCase):

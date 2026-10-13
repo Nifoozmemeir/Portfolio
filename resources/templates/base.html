@@ -443,24 +443,27 @@
                 <p class="section-subtitle">{% translate '¿Tenés un proyecto en mente? Trabajemos juntos para hacer realidad tus ideas' %}</p>
             </div>
             <div class="contact-form" data-aos="fade-up" data-aos-delay="100">
-                <form id="contactForm" data-success-message="{% translate '¡Mensaje enviado con éxito!' %}">
+                <form id="contactForm" action="{% url 'contact' %}" method="post" data-success-message="{% translate '¡Mensaje enviado con éxito!' %}" data-error-message="{% translate 'No se pudo enviar el mensaje, probá de nuevo en un rato.' %}" data-limit-message="{% translate 'Mandaste varios mensajes seguidos, probá de nuevo más tarde.' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="token" value="{{ contacttoken }}">
+                    <div class="contact-honeypot" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="{% translate 'Tu nombre' %}" required>
+                                <input type="text" name="name" maxlength="100" class="form-control" placeholder="{% translate 'Tu nombre' %}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="email" class="form-control" placeholder="{% translate 'Tu email' %}" required>
+                                <input type="email" name="email" maxlength="254" class="form-control" placeholder="{% translate 'Tu email' %}" required>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="{% translate 'Asunto' %}" required>
+                        <input type="text" name="subject" maxlength="150" class="form-control" placeholder="{% translate 'Asunto' %}" required>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-control" placeholder="{% translate 'Tu mensaje' %}" required></textarea>
+                        <textarea name="message" maxlength="3000" class="form-control" placeholder="{% translate 'Tu mensaje' %}" required></textarea>
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn-gradient"><i class="fa-solid fa-paper-plane"></i> {% translate 'Enviar mensaje' %}</button>

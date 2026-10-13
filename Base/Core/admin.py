@@ -151,6 +151,16 @@ class ExperienceMediaAdmin(TabbedTranslationAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('experience', 'order')
 
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'id', 'name', 'email', 'issent', 'created_at')
+    list_filter = (('issent', DropdownFilter),)
+    search_fields = ('name', 'email', 'subject', 'message')
+    readonly_fields = ('name', 'email', 'subject', 'message', 'issent', 'sent_at', 'created_at', 'updated_at')
+    ordering = ('-created_at',)
+
+    def has_add_permission(self, request):
+        return False # Los mensajes solo llegan desde el form de la web
+
 admin.site.register(AboutMeContent, AboutMeContentAdmin)
 admin.site.register(AboutMeStat, AboutMeStatAdmin)
 admin.site.register(AboutMeImage, AboutMeImageAdmin)
@@ -169,3 +179,4 @@ admin.site.register(ExperienceHighlightMedia, ExperienceHighlightMediaAdmin)
 admin.site.register(ExperienceSkill, ExperienceSkillAdmin)
 admin.site.register(ExperienceLink, ExperienceLinkAdmin)
 admin.site.register(ExperienceMedia, ExperienceMediaAdmin)
+admin.site.register(ContactMessage, ContactMessageAdmin)
