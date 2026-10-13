@@ -69,13 +69,13 @@
                         <a class="nav-link" href="#about">About</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#experience">Experience</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#projects">Projects</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#skills">Skills</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#experience">Experience</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Contact</a>
@@ -162,13 +162,13 @@
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="about-content">
                         <h3 class="mb-4">{{ aboutmecontent.header }}</h3>
-                        <p class="text-muted mb-4">{{ aboutmecontent.paragraph }}</p>
+                        <p class="about-paragraph mb-4">{{ aboutmecontent.paragraph }}</p>
                         <div class="about-stats">
                             <div class="row">
                                 {% for stat in aboutmestats %}
                                     <div class="col-4">
                                         <h4 class="gradient-text">{{ stat.value }}</h4>
-                                        <p class="text-muted">{{ stat.label }}</p>
+                                        <p class="about-stat-label">{{ stat.label }}</p>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -176,6 +176,157 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+    <!-- Experience Section -->
+    <section class="section experience-section" id="experience">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Experience</h2>
+                <p class="section-subtitle">Where I've worked and where I've learned</p>
+            </div>
+            {% if experiencecategories %}
+                <div class="experience-tabs-wrapper" data-aos="fade-up" data-aos-delay="100">
+                    <div class="experience-tabs" role="tablist">
+                        {% for category in experiencecategories %}
+                            <button type="button" class="experience-tab {% if forloop.first %}active{% endif %}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" data-target="{{ category.slug }}"><i class="{{ category.icon }}"></i> {{ category.name }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% for category in experiencecategories %}
+                    <div class="experience-panel" role="tabpanel" data-tab="{{ category.slug }}" {% if not forloop.first %}hidden{% endif %}>
+                        {% for experience in category.experiences.all %}
+                            <div class="timeline-entry" data-aos="fade-up">
+                                <div class="timeline-rail">
+                                    <div class="timeline-dot"><i class="{{ category.icon }}"></i></div>
+                                    {% if not forloop.last %}<div class="timeline-line"></div>{% endif %}
+                                </div>
+                                <article class="experience-card">
+                                    <header class="experience-header">
+                                        {% if experience.logo %}
+                                            <img src="{{ experience.logo.url }}" class="experience-logo" alt="{{ experience.organization }}" loading="lazy">
+                                        {% endif %}
+                                        <div class="experience-heading">
+                                            <h3 class="experience-role">{{ experience.role }}</h3>
+                                            <p class="experience-meta">
+                                                <span class="experience-organization">{{ experience.organization }}</span>
+                                                {% if experience.location %}<span class="experience-location"><i class="fa-solid fa-location-dot"></i> {{ experience.location }}</span>{% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="experience-dates-block">
+                                            <span class="experience-dates-chip"><i class="fa-solid fa-calendar"></i> {{ experience.startdate|date:"d/m/Y" }} — {% if experience.enddate %}{{ experience.enddate|date:"d/m/Y" }}{% else %}Present{% endif %}</span>
+                                            {% if not experience.enddate %}<span class="experience-current"><span class="experience-current-dot"></span>Current role</span>{% endif %}
+                                        </div>
+                                    </header>
+                                    {% if experience.summary %}<p class="experience-summary">{{ experience.summary }}</p>{% endif %}
+                                    {% if experience.metrics.all %}
+                                        <div class="experience-metrics">
+                                            {% for metric in experience.metrics.all %}
+                                                <div class="experience-metric">
+                                                    <span class="experience-metric-value">{{ metric.value }}</span>
+                                                    <span class="experience-metric-label">{{ metric.label }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if experience.highlights.all %}
+                                        <div class="experience-block">
+                                            <h4 class="experience-block-label">What I built</h4>
+                                            <div class="experience-highlights">
+                                                {% for highlight in experience.highlights.all %}
+                                                    <div class="experience-highlight">
+                                                        <div class="experience-highlight-icon"><i class="{{ highlight.icon }}"></i></div>
+                                                        <div class="experience-highlight-text">
+                                                            {% if highlight.title %}<span class="experience-highlight-title">{{ highlight.title }}</span>{% endif %}
+                                                            <span class="experience-highlight-description">{{ highlight.description }}</span>
+                                                            {% with images=highlight.imageMedia urls=highlight.urlMedia %}
+                                                                {% if images or urls %}
+                                                                    <div class="highlight-media">
+                                                                        {% if images %}
+                                                                            <button type="button" class="highlight-media-btn" data-bs-toggle="modal" data-bs-target="#highlightGallery" data-title="{{ highlight.title }}" aria-label="View images"><i class="fa-solid fa-images"></i> {{ images|length }}</button>
+                                                                            <template class="highlight-gallery-items">
+                                                                                {% for media in images %}
+                                                                                    <figure><img src="{{ media.image.url }}" alt="{{ media.label }}"><figcaption>{{ media.label }}</figcaption></figure>
+                                                                                {% endfor %}
+                                                                            </template>
+                                                                        {% endif %}
+                                                                        {% for media in urls %}
+                                                                            <a href="{{ media.url }}" class="highlight-media-btn" target="_blank" rel="noopener"><i class="{{ media.icon }}"></i> {{ media.label }}</a>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if experience.media.all %}
+                                        <div class="experience-block">
+                                            <h4 class="experience-block-label">Moments</h4>
+                                            {% with medias=experience.media.all %}
+                                            <div id="carouselExperience{{ experience.pk }}" class="carousel slide experience-media-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+                                                <div class="carousel-inner">
+                                                    {% for media in medias %}
+                                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                            <div class="experience-media-frame {% if media.youtubeId %}experience-media-frame-youtube{% endif %}">
+                                                                {% if media.file %}
+                                                                    {% if media.isVideo %}
+                                                                        <video src="{{ media.file.url }}#t=0.001" class="experience-media-file project-video" preload="metadata" muted loop playsinline aria-label="{{ media.title }}"></video>
+                                                                    {% else %}
+                                                                        <img src="{{ media.file.url }}" class="experience-media-file" alt="{{ media.title }}" loading="lazy">
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    {% with youtubeid=media.youtubeId %}
+                                                                        {% if youtubeid %}
+                                                                            <iframe src="https://www.youtube-nocookie.com/embed/{{ youtubeid }}" class="experience-media-file" title="{{ media.title }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                                                        {% else %}
+                                                                            <a href="{{ media.url }}" class="experience-media-file experience-media-link" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> {{ media.urlDomain }}</a>
+                                                                        {% endif %}
+                                                                    {% endwith %}
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="experience-media-text">
+                                                                <span class="experience-media-title">{{ media.title }}</span>
+                                                                {% if media.caption %}<span class="experience-media-caption">{{ media.caption }}</span>{% endif %}
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% if medias|length > 1 %}
+                                                    <div class="experience-media-nav">
+                                                        <button type="button" class="experience-media-nav-btn" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide="prev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+                                                        <div class="carousel-indicators">
+                                                            {% for media in medias %}
+                                                                <button type="button" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                                                            {% endfor %}
+                                                        </div>
+                                                        <button type="button" class="experience-media-nav-btn" data-bs-target="#carouselExperience{{ experience.pk }}" data-bs-slide="next" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endwith %}
+                                        </div>
+                                    {% endif %}
+                                    {% if experience.skills.all %}
+                                        <div class="experience-tags">
+                                            {% for skill in experience.skills.all %}<span class="project-tag {% if skill.issoftskill %}soft-skill-tag{% endif %}">{{ skill.name }}</span>{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if experience.links.all %}
+                                        <div class="experience-links">
+                                            {% for link in experience.links.all %}
+                                                <a href="{{ link.url }}" class="{% if forloop.first %}btn-gradient{% else %}project-link{% endif %}" target="_blank" rel="noopener"><i class="{{ link.icon }}"></i> {{ link.label }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </article>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </section>
     <!-- Projects Section -->
@@ -268,16 +419,6 @@
             </div>
         </div>
     </section>
-    <!-- Experience Section -->
-    <section class="section experience-section" id="experience">
-        <div class="container">
-            <div class="section-title" data-aos="fade-up">
-                <h2>Experience</h2>
-                <p class="section-subtitle">My professional journey and key milestones</p>
-            </div>
-            <!-- Timeline aquí -->
-        </div>
-    </section>
     <!-- Contact Section -->
     <section class="section contact-section" id="contact">
         <div class="container">
@@ -322,10 +463,31 @@
                     <a href="#projects" class="footer-link">Projects</a>
                     <a href="#contact" class="footer-link">Contact</a>
                 </div>
-                <p class="footer-copy">© 2024 Julian Rosas. Built with Django & ❤️ in Rosario, Argentina.</p>
+                <p class="footer-copy">© 2023 - 2026 Julian Rosas Sandillú. Built with Django & ❤️</p>
             </div>
         </div>
     </footer>
+
+    <!-- Modal de imágenes de los highlights de Experience (uno solo para todos, lo llena base.js) -->
+    <div class="modal fade gallery-modal" id="highlightGallery" tabindex="-1" aria-labelledby="highlightGalleryTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="highlightGalleryTitle"></h5>
+                    <button type="button" class="gallery-close" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div id="highlightGalleryCarousel" class="carousel slide carousel-fade">
+                        <div class="carousel-indicators"></div>
+                        <div class="carousel-inner"></div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#highlightGalleryCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span></button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#highlightGalleryCarousel" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JS Scripts -->
     <!-- Bootstrap 5 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>

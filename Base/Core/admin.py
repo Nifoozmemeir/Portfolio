@@ -81,6 +81,75 @@ class SkillAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
+class ExperienceCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'slug', 'icon', 'order')
+    search_fields = ('name',)
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('order',)
+
+class ExperienceAdmin(admin.ModelAdmin):
+    list_display = ('role', 'id', 'organization', 'category', 'startdate', 'enddate', 'order')
+    list_filter = (('category', RelatedDropdownFilter),)
+    list_select_related = ('category',)
+    raw_id_fields = ('category',)
+    search_fields = ('role', 'organization', 'summary')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('category', 'order')
+
+class ExperienceMetricAdmin(admin.ModelAdmin):
+    list_display = ('value', 'label', 'id', 'experience', 'order')
+    list_filter = (('experience', RelatedDropdownFilter),)
+    list_select_related = ('experience',)
+    raw_id_fields = ('experience',)
+    search_fields = ('label', 'experience__role')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('experience', 'order')
+
+class ExperienceHighlightAdmin(admin.ModelAdmin):
+    list_display = ('title', 'id', 'experience', 'icon', 'order')
+    list_filter = (('experience', RelatedDropdownFilter),)
+    list_select_related = ('experience',)
+    raw_id_fields = ('experience',)
+    search_fields = ('title', 'description', 'experience__role')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('experience', 'order')
+
+class ExperienceHighlightMediaAdmin(admin.ModelAdmin):
+    list_display = ('label', 'id', 'highlight', 'url', 'order')
+    list_filter = (('highlight', RelatedDropdownFilter),)
+    list_select_related = ('highlight__experience',)
+    raw_id_fields = ('highlight',)
+    search_fields = ('label', 'url', 'highlight__title')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('highlight', 'order')
+
+class ExperienceSkillAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'experience', 'issoftskill', 'order')
+    list_filter = (('experience', RelatedDropdownFilter), ('issoftskill', DropdownFilter))
+    list_select_related = ('experience',)
+    raw_id_fields = ('experience',)
+    search_fields = ('name', 'experience__role')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('experience', 'order')
+
+class ExperienceLinkAdmin(admin.ModelAdmin):
+    list_display = ('label', 'id', 'experience', 'url', 'order')
+    list_filter = (('experience', RelatedDropdownFilter),)
+    list_select_related = ('experience',)
+    raw_id_fields = ('experience',)
+    search_fields = ('label', 'experience__role')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('experience', 'order')
+
+class ExperienceMediaAdmin(admin.ModelAdmin):
+    list_display = ('title', 'id', 'experience', 'isVideo', 'url', 'order')
+    list_filter = (('experience', RelatedDropdownFilter),)
+    list_select_related = ('experience',)
+    raw_id_fields = ('experience',)
+    search_fields = ('title', 'caption', 'url', 'experience__role')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('experience', 'order')
+
 admin.site.register(AboutMeContent, AboutMeContentAdmin)
 admin.site.register(AboutMeStat, AboutMeStatAdmin)
 admin.site.register(AboutMeImage, AboutMeImageAdmin)
@@ -91,3 +160,11 @@ admin.site.register(ProjectTag, ProjectTagAdmin)
 admin.site.register(ProjectLink, ProjectLinkAdmin)
 admin.site.register(SkillLevel, SkillLevelAdmin)
 admin.site.register(Skill, SkillAdmin)
+admin.site.register(ExperienceCategory, ExperienceCategoryAdmin)
+admin.site.register(Experience, ExperienceAdmin)
+admin.site.register(ExperienceMetric, ExperienceMetricAdmin)
+admin.site.register(ExperienceHighlight, ExperienceHighlightAdmin)
+admin.site.register(ExperienceHighlightMedia, ExperienceHighlightMediaAdmin)
+admin.site.register(ExperienceSkill, ExperienceSkillAdmin)
+admin.site.register(ExperienceLink, ExperienceLinkAdmin)
+admin.site.register(ExperienceMedia, ExperienceMediaAdmin)

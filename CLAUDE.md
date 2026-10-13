@@ -42,14 +42,24 @@ Siempre y en todo el código propio:
   ```python
   icon = models.CharField("Icon", max_length=50) # La clase de Font Awesome que se renderiza como <i class="...">
   ```
-- **Constantes y `choices` se definen adentro del model sobre el que actúan, en sus primeras líneas** (antes de los campos), no sueltas a nivel módulo. Desde los métodos se usan con `self.CONSTANTE`:
-  ```python
-  class ProjectImage(models.Model):
-      MEDIA_EXTENSIONS = ['jpg', 'png', 'mp4'] # Formatos que acepta file
+- **Constantes y `choices`: dónde van depende de cuántos models las usan.** Nunca se repite la misma constante en dos models.
+  - **Si la usa un solo model** → adentro de ese model, en sus primeras líneas (antes de los campos). Desde los métodos se usa con `self.CONSTANTE`:
+    ```python
+    class ExperienceMedia(models.Model):
+        YOUTUBE_PATTERN = r'...' # Saca el id del video de cualquier link de YouTube
 
-      project = models.ForeignKey(...)
-      file = models.FileField(..., validators=[FileExtensionValidator(MEDIA_EXTENSIONS)])
-  ```
+        url = models.URLField(...)
+    ```
+  - **Si la usan dos o más models** → a nivel módulo, arriba de todo: después de los imports y antes del primer model. Desde los métodos se usa directo, sin `self.`:
+    ```python
+    from django.db import models
+
+    MEDIA_EXTENSIONS = ['jpg', 'png', 'mp4'] # Formatos que aceptan los file de media (ProjectImage, ExperienceMedia)
+
+    class ProjectImage(models.Model):
+        file = models.FileField(..., validators=[FileExtensionValidator(MEDIA_EXTENSIONS)])
+    ```
+  - Si una constante de un model pasa a usarse en otro, se sube al módulo en ese mismo cambio.
 
 ### `admin.py`
 
@@ -173,7 +183,7 @@ Migraciones: solo cuando el usuario lo pide. No hay linter/formatter configurado
 
 - **`base.html` es el home y LA base.** Todo el sitio (hero, about, projects, skills, experience, contact, footer) en una sola página con anclas. La única vista vigente es `Home` (`/`) → `base.html`.
 - **Diseño:** sale de `base.html` + [resources/static/css/base.css](resources/static/css/base.css) y se replica en todo el resto. Tokens en `:root` de `base.css`:
-  `--primary-color: #667eea`, `--secondary-color: #764ba2`, `--dark-bg: #0a0e27`, `--darker-bg: #040613`, `--light-text: #e2e8f0`, `--muted-text: #94a3b8`, `--accent-color: #f59e0b`, `--success-color: #10b981`, `--navbar-height: 70px`.
+  `--primary-color: #667eea`, `--secondary-color: #764ba2`, `--dark-bg: #0a0e27`, `--darker-bg: #040613`, `--light-text: #e2e8f0`, `--muted-text: #94a3b8`, `--accent-color: #f59e0b`, `--success-color: #10b981`, `--navbar-height: 70px`, `--photo-ratio: 1600 / 739`, `--about-photo-ratio: 4 / 3`.
   Usar siempre estas variables, nunca hardcodear un color nuevo.
 
 ### Normas de código
@@ -181,6 +191,8 @@ Migraciones: solo cuando el usuario lo pide. No hay linter/formatter configurado
 - **Un archivo nuevo = un trío con el mismo nombre:** `resources/templates/X.html` + `resources/static/css/X.css` + `resources/static/js/X.js` (como `base.*`).
 - **Lo mínimo hardcodeado.** El texto va en la base de datos y se edita desde el admin, no en el HTML. **Excepción:** los títulos y subtítulos fijos de cada sección (ej. "About Me", "Skills & Technologies" y sus subtítulos) dicen siempre lo mismo y van hardcodeados en el HTML; no se hace un model ni un campo para eso. Ante la duda de si un texto es fijo, preguntar. Al trabajar en cualquier sección, **sugerir proactivamente qué conviene pasar a models**; el usuario espera esa propuesta.
 - **Nada de `TextChoices` / `choices=` para listas que pueden crecer** (categorías, tipos, estados): model aparte + `ForeignKey`, así se agregan opciones desde el admin sin tocar código. `choices` solo si el conjunto es fijo por naturaleza.
+- **Las imágenes (y videos) dentro de un container se ven SIEMPRE enteras, nunca recortadas**, en cualquier tamaño de pantalla (celular, tablet, notebook, monitor). Si la imagen es más grande o tiene otra proporción que el container, se achica hasta entrar completa: `object-fit: contain` (nunca `cover`), con un fondo de los tokens (`--dark-bg`/`--darker-bg`) en el espacio que sobra. Tampoco efectos que la recorten (ej. `scale()` en hover dentro de un `overflow: hidden`). Vale para todo lo que se agregue: cards, carruseles, modales, logos.
+- **Todo recuadro de fotos tiene la proporción de una foto horizontal de WhatsApp (1600×739)**: `aspect-ratio: var(--photo-ratio)` con `width: 100%` y `height: auto`. Nunca un alto fijo en px/vh ni un `max-height`, porque rompen la proporción y dejan espacios vacíos. Así escala igual en cualquier pantalla y esas fotos lo llenan justo. Excepciones: un YouTube embebido usa el 16:9 de su reproductor, y el carrusel de About Me usa `var(--about-photo-ratio)` (4:3) porque lleva fotos de cámara (4608×3456 y 3456×2304). Si otro recuadro necesita otra proporción, se crea un token propio en `:root`, nunca un valor suelto.
 - **`return render(...)` siempre en una sola línea**, con el contexto inline, por más largo que quede.
 - **Nunca dejar un N+1.** Si el template accede a una relación (`{{ obj.fk.campo }}`, `{% for x in obj.hijos.all %}`), la vista la trae de antemano: `select_related()` para FK, `prefetch_related()` para inversas y M2M. Vale también al sumar un campo relacionado a un template existente.
 - **Nada de `help_text`.** Las aclaraciones van como comentario `#` en la misma línea del campo (ver "`models.py`" en la Parte 1); si le sirven al usuario en el admin, van en el `verbose_name` (primer argumento posicional).

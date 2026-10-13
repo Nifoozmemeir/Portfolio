@@ -101,7 +101,61 @@ filterBtns.forEach(btn => {
         });
     });
 });
-// Videos de los Projects, en 3 etapas para que nunca se vea un recuadro vacío sin bajar todo de una:
+// Tabs de Experience: muestra solo el panel de la categoría elegida
+const experienceTabs = document.querySelectorAll('.experience-tab');
+const experiencePanels = document.querySelectorAll('.experience-panel');
+experienceTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-target');
+        experienceTabs.forEach(t => {
+            t.classList.toggle('active', t === tab);
+            t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+        });
+        experiencePanels.forEach(panel => {
+            panel.hidden = panel.getAttribute('data-tab') !== target;
+        });
+        AOS.refresh(); // Las entradas del panel que estaba oculto no tenían posición calculada y no se animarían
+    });
+});
+// Modal de imágenes de los highlights de Experience: hay un solo modal, y cada botón trae sus imágenes
+// en el <template> de al lado (no se descargan hasta que se abre). Al abrir se arma el carrusel y pasa solo.
+const galleryModal = document.getElementById('highlightGallery');
+if (galleryModal) {
+    const galleryCarousel = document.getElementById('highlightGalleryCarousel');
+    const galleryInner = galleryCarousel.querySelector('.carousel-inner');
+    const galleryIndicators = galleryCarousel.querySelector('.carousel-indicators');
+    galleryModal.addEventListener('show.bs.modal', (e) => {
+        const btn = e.relatedTarget;
+        const figures = btn.nextElementSibling.content.querySelectorAll('figure');
+        document.getElementById('highlightGalleryTitle').textContent = btn.dataset.title;
+        galleryInner.innerHTML = '';
+        galleryIndicators.innerHTML = '';
+        figures.forEach((figure, index) => {
+            const item = document.createElement('div');
+            item.className = 'carousel-item' + (index === 0 ? ' active' : '');
+            item.appendChild(figure.cloneNode(true));
+            galleryInner.appendChild(item);
+            const dot = document.createElement('button');
+            dot.type = 'button';
+            dot.dataset.bsTarget = '#highlightGalleryCarousel';
+            dot.dataset.bsSlideTo = index;
+            dot.setAttribute('aria-label', `Slide ${index + 1}`);
+            if (index === 0) {
+                dot.className = 'active';
+                dot.setAttribute('aria-current', 'true');
+            }
+            galleryIndicators.appendChild(dot);
+        });
+        galleryCarousel.classList.toggle('gallery-single', figures.length < 2); // Con una sola imagen no van flechas ni puntitos
+    });
+    galleryModal.addEventListener('shown.bs.modal', () => {
+        bootstrap.Carousel.getOrCreateInstance(galleryCarousel, { interval: 4000, ride: 'carousel' }).cycle();
+    });
+    galleryModal.addEventListener('hidden.bs.modal', () => {
+        bootstrap.Carousel.getInstance(galleryCarousel)?.dispose(); // Al cerrar se descarta, así el próximo highlight arranca de cero
+    });
+}
+// Videos de los Projects (y de la media de Experience), en 3 etapas para que nunca se vea un recuadro vacío sin bajar todo de una:
 // 1. Al cargar la página: preload="metadata" + "#t=0.001" en la URL, solo se bajan unos KB
 //    para dibujar el primer frame (el #t=0.001 hace que Safari/iPhone también lo dibuje).
 // 2. Cuando una card está a 600px de entrar en pantalla, sus videos empiezan a bajarse enteros.
@@ -121,7 +175,7 @@ const preloadObserver = new IntersectionObserver((entries) => {
         }
     });
 }, { rootMargin: '600px 0px' });
-projectCards.forEach(card => {
+document.querySelectorAll('.project-card, .experience-media-carousel').forEach(card => {
     if (card.querySelector('.project-video')) preloadObserver.observe(card);
 });
 const videoObserver = new IntersectionObserver((entries) => {
