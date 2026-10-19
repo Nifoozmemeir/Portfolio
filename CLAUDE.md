@@ -125,6 +125,14 @@ Tiene que cubrir como mínimo: entornos virtuales, `__pycache__`/compilados, `.e
 - Las versiones tienen que ser **compatibles con la versión de Python del proyecto** (la del venv). Antes de agregar o subir un paquete, verificar que soporte esa versión: ni demasiado nuevo ni demasiado viejo.
 - Al instalar o quitar un paquete, actualizar `requirements.txt` en el mismo cambio.
 
+### Librerías siempre en su última versión
+
+- Todo lo que viene de afuera se mantiene en su **última versión**: las librerías del front por CDN (Bootstrap, Font Awesome, SweetAlert2, etc.) y los paquetes de `requirements.txt`. Una versión vieja trae bugs y faltantes (ej.: íconos de Font Awesome que no existen en una versión anterior).
+- **Versiones menores y parches** (5.3.7 → 5.3.8, 7.0 → 7.3) se actualizan directo, al revisar o tocar algo que las usa.
+- **Versión mayor** (Bootstrap 5 → 6, Django 5 → 6, etc.) **no se actualiza sola**: puede romper todo. Se avisa al usuario qué cambia y se espera el OK.
+- En los CDN, siempre versión exacta (`@7.3.1`, nunca `@latest` ni `@7`) y con `integrity` (SRI) recalculado para la versión nueva, verificado contra el archivo real.
+- Los paquetes de Python, además, compatibles con la versión de Python del proyecto (ver arriba).
+
 ### Estructura de carpetas
 
 - **`resources/`** en la raíz contiene todo el front:
