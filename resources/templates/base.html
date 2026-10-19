@@ -40,6 +40,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- AOS (Animate On Scroll) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.css" integrity="sha384-dCW5imOdApH6OwpFau8cZNKjqVbJYnCA5q+8YsMYP3XwXKsV6Jfz1u6MZLnXaBsS" crossorigin="anonymous">
     <!-- CSS del base -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <!-- Cursores personalizados -->
@@ -124,15 +126,15 @@
                 </p>
             </div>
             <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
-                <a href="#projects" class="btn-gradient"><i class="fa-solid fa-folder-open me-2"></i> {% translate 'Ver proyectos' %}</a>
+                <a href="#experience" class="btn-gradient"><i class="fa-solid fa-briefcase me-2"></i> {% translate 'Ver experiencia' %}</a>
+                <a href="#projects" class="btn-outline-gradient"><i class="fa-solid fa-folder-open me-2"></i> {% translate 'Ver proyectos' %}</a>
                 <a href="#contact" class="btn-outline-gradient"><i class="fa-solid fa-envelope me-2"></i> {% translate 'Contactame' %}</a>
             </div>
             <div class="social-links" data-aos="fade-up" data-aos-delay="500">
                 <a href="https://github.com/Nifoozmemeir" class="social-link" target="_blank"><i class="fa-brands fa-github"></i></a>
                 <a href="https://linkedin.com/in/julian-ers/" class="social-link" target="_blank"><i class="fa-brands fa-square-linkedin"></i></a>
                 <a href="https://linktr.ee/julian.ers" class="social-link" target="_blank"><i class="fa-brands fa-linktree"></i></a>
-                <a href="mailto:julian.ers@hotmail.com" class="social-link"><i class="fa-solid fa-envelope"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-discord"></i></a>
+                <a href="#contact" class="social-link"><i class="fa-solid fa-envelope"></i></a>
             </div>
         </div>
         <div class="scroll-indicator">
@@ -177,8 +179,26 @@
                 </div>
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="about-content">
-                        <h3 class="mb-4">{{ aboutmecontent.header }}</h3>
-                        <p class="about-paragraph mb-4">{{ aboutmecontent.paragraph }}</p>
+                        <!-- Carrusel de texto: cada AboutMeContent es una slide (Full Stack, Game Dev...) -->
+                        {% if aboutmecontents %}
+                            <div id="carouselAboutText" class="carousel carousel-fade about-text-carousel mb-4" {% if aboutmecontents|length > 1 %}data-bs-ride="carousel" data-bs-interval="7000"{% endif %}>
+                                <div class="carousel-inner">
+                                    {% for content in aboutmecontents %}
+                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                            <h3 class="mb-4">{{ content.header }}</h3>
+                                            <p class="about-paragraph mb-0">{{ content.paragraph }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if aboutmecontents|length > 1 %}
+                                    <div class="carousel-indicators">
+                                        {% for content in aboutmecontents %}
+                                            <button type="button" data-bs-target="#carouselAboutText" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="{{ content.header }}"></button>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                         <div class="about-stats">
                             <div class="row">
                                 {% for stat in aboutmestats %}
@@ -419,19 +439,21 @@
                 <h2>{% translate 'Habilidades y tecnologías' %}</h2>
                 <p class="section-subtitle">{% translate 'Las herramientas y tecnologías con las que trabajo para darle vida a las ideas' %}</p>
             </div>
-            <div class="skills-grid">
-                {% for skill in skills %}
-                    <div class="skill-card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00">
-                        <div class="skill-icon">
-                            <i class="{{ skill.icon }}"></i>
-                        </div>
-                        <h4 class="skill-name">{{ skill.name }}</h4>
-                        <p class="skill-level">{{ skill.level.name }}</p>
-                        <div class="skill-progress">
-                            <div class="skill-progress-bar" style="width: {{ skill.percentage }}%;"></div>
+            <div class="skills-groups">
+                {% for category in skillcategories %}{% if category.skills.all %}
+                    <div class="skill-group" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                        <h3 class="skill-group-title"><span class="skill-group-icon"><i class="{{ category.icon }}"></i></span> {{ category.name }}</h3>
+                        <div class="skills-grid">
+                            {% for skill in category.skills.all %}
+                                <div class="skill-card">
+                                    <div class="skill-icon"><i class="{{ skill.icon }}"></i></div>
+                                    <h4 class="skill-name">{{ skill.name }}</h4>
+                                    <span class="skill-level">{{ skill.level.name }}</span>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
-                {% endfor %}
+                {% endif %}{% endfor %}
             </div>
         </div>
     </section>
@@ -443,7 +465,7 @@
                 <p class="section-subtitle">{% translate '¿Tenés un proyecto en mente? Trabajemos juntos para hacer realidad tus ideas' %}</p>
             </div>
             <div class="contact-form" data-aos="fade-up" data-aos-delay="100">
-                <form id="contactForm" action="{% url 'contact' %}" method="post" data-success-message="{% translate '¡Mensaje enviado con éxito!' %}" data-error-message="{% translate 'No se pudo enviar el mensaje, probá de nuevo en un rato.' %}" data-limit-message="{% translate 'Mandaste varios mensajes seguidos, probá de nuevo más tarde.' %}">
+                <form id="contactForm" action="{% url 'contact' %}" method="post" data-success-title="{% translate '¡Mensaje enviado!' %}" data-success-message="{% translate 'Gracias por escribirme, ya lo tengo en mi bandeja. Te respondo lo antes posible.' %}" data-listo-button="{% translate 'Listo' %}" data-otro-button="{% translate 'Enviar otro email' %}" data-error-title="{% translate 'Ups...' %}" data-error-message="{% translate 'No se pudo enviar el mensaje, probá de nuevo en un rato.' %}" data-limit-message="{% translate 'Mandaste varios mensajes seguidos, probá de nuevo más tarde.' %}">
                     {% csrf_token %}
                     <input type="hidden" name="token" value="{{ contacttoken }}">
                     <div class="contact-honeypot" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
@@ -513,6 +535,8 @@
     <!-- AOS (Animate On Scroll) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- JS del base -->
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.js" integrity="sha384-hW8ZCQHtRH+nVOAkHZ4amZvYsAtKn1ZOvMV6dNag1Rb1thWmLZMBKTRxFV0cOxiK" crossorigin="anonymous"></script>
     <script src="{% static 'js/base.js' %}"></script>
 </body>
 </html>

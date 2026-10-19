@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlparse
 from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator, MaxValueValidator
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
 
@@ -9,27 +9,20 @@ MEDIA_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4'] # Formatos que a
 VIDEO_EXTENSIONS = ['mp4'] # Los que se renderizan como <video>, el resto como <img>
 
 class AboutMeContent(models.Model):
-    header = models.CharField("Header", max_length=200, null=False, blank=False)
+    header = models.CharField("Header", max_length=200, null=False, blank=False) # Cada fila es una slide del carrusel de texto, ej: Desarrollador Full Stack, Game Dev
     paragraph = models.TextField("Paragraph", null=False, blank=False)
+    order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'About Me - Content'
-        verbose_name_plural = 'About Me - Content'
+        verbose_name_plural = 'About Me - Contents'
+        ordering = ('order',)
 
     def __str__(self):
         return f"{self.header}"
-
-    # Singleton - Solo existe 1 registro
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super().save(*args, **kwargs)
-    @classmethod
-    def load(cls):
-        obj, _ = cls.objects.get_or_create(pk=1)
-        return obj
 
 class AboutMeStat(models.Model):
     value = models.CharField("Value", max_length=10, null=False, blank=False)
@@ -171,11 +164,27 @@ class SkillLevel(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+class SkillCategory(models.Model):
+    name = models.CharField("Name", max_length=50, null=False, blank=False) # El título del grupo, ej: Backend
+    icon = models.CharField("Icon (ej: fa-solid fa-server)", max_length=50, null=False, blank=False, default='fa-solid fa-layer-group') # Va al lado del título del grupo
+    order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Skill - Category'
+        verbose_name_plural = 'Skill - Categories'
+        ordering = ('order',)
+
+    def __str__(self):
+        return f"{self.name}"
+
 class Skill(models.Model):
     name = models.CharField("Name", max_length=50, null=False, blank=False)
     icon = models.CharField("Icon (ej: fa-brands fa-python)", max_length=50, null=False, blank=False, default='fa-solid fa-code')
+    category = models.ForeignKey(SkillCategory, verbose_name="Category", on_delete=models.PROTECT, related_name='skills', null=True, blank=False) # null solo para que las skills que ya existen migren sin default; el admin la pide igual y sin categoría no se muestra en la web
     level = models.ForeignKey(SkillLevel, verbose_name="Level", on_delete=models.PROTECT, related_name='skills')
-    percentage = models.PositiveSmallIntegerField("Percentage (0-100)", null=False, blank=False, default=50, validators=[MaxValueValidator(100)])
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)

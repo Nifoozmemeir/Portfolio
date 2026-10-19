@@ -206,6 +206,20 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 // Form de contact: lo manda por fetch, el email lo envía Celery en segundo plano
+const swalBase = {
+    customClass: { popup: 'contact-swal', confirmButton: 'contact-swal-btn contact-swal-btn-otro', denyButton: 'contact-swal-btn contact-swal-btn-listo' },
+    buttonsStyling: false,
+};
+// Recarga como un F5 pero arrancando arriba (o en contact), con el form limpio y un token nuevo
+function recargarPagina(ircontacto) {
+    if (ircontacto) sessionStorage.setItem('irAContacto', '1');
+    history.scrollRestoration = 'manual';
+    location.replace(location.pathname);
+}
+if (sessionStorage.getItem('irAContacto')) {
+    sessionStorage.removeItem('irAContacto');
+    window.addEventListener('load', () => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+}
 document.getElementById('contactForm')?.addEventListener('submit', async function (e) {
     e.preventDefault();
     const boton = this.querySelector('button[type="submit"]');
@@ -213,15 +227,27 @@ document.getElementById('contactForm')?.addEventListener('submit', async functio
     try {
         const respuesta = await fetch(this.action, { method: 'POST', body: new FormData(this) });
         if (respuesta.status === 429) {
-            alert(this.dataset.limitMessage);
+            Swal.fire({ ...swalBase, icon: 'warning', title: this.dataset.errorTitle, text: this.dataset.limitMessage });
             return;
         }
         if (!respuesta.ok) throw new Error(respuesta.status);
-        alert(this.dataset.successMessage);
         this.reset();
+        const resultado = await Swal.fire({
+            ...swalBase,
+            icon: 'success',
+            title: this.dataset.successTitle,
+            text: this.dataset.successMessage,
+            showDenyButton: true,
+            denyButtonText: this.dataset.listoButton,
+            confirmButtonText: '<i class="fa-solid fa-paper-plane"></i> ' + this.dataset.otroButton,
+            reverseButtons: true, // Listo a la izquierda, el violeta a la derecha
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+        });
+        recargarPagina(resultado.isConfirmed);
     } catch (err) {
         console.warn('No se pudo enviar el form de contacto:', err);
-        alert(this.dataset.errorMessage);
+        Swal.fire({ ...swalBase, icon: 'error', title: this.dataset.errorTitle, text: this.dataset.errorMessage });
     } finally {
         boton.disabled = false;
     }
@@ -268,27 +294,4 @@ document.addEventListener('mousemove', (e) => {
         const speed = (index + 1) * 20;
         shape.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
     });
-});
-// Animación en la barra de progreso de las skills
-const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px 0px -100px 0px'
-};
-const skillObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const progressBars = entry.target.querySelectorAll('.skill-progress-bar');
-            progressBars.forEach(bar => {
-                const width = bar.style.width;
-                bar.style.width = '0%';
-                setTimeout(() => {
-                    bar.style.width = width;
-                }, 200);
-            });
-            skillObserver.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-document.querySelectorAll('.skill-card').forEach(card => {
-    skillObserver.observe(card);
 });

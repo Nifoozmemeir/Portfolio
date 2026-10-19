@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
+    <title>{{ mensaje.subject }}</title>
+</head>
+<!-- Email: los clientes de correo no leen CSS externo ni variables, por eso todo va inline con los hex de los tokens de base.css -->
+<body style="margin:0; padding:0; background-color:#040613;">
+    <!-- Preheader: el texto que muestra la bandeja al lado del asunto -->
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0;">{{ mensaje.name }} te escribió desde jersdev.com: {{ mensaje.message|truncatechars:120 }}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#040613" style="background-color:#040613;">
+        <tr>
+            <td align="center" style="padding:32px 16px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; font-family:'Segoe UI', Inter, Helvetica, Arial, sans-serif;">
+                    <!-- Header -->
+                    <tr>
+                        <td bgcolor="#667eea" style="background-color:#667eea; background-image:linear-gradient(135deg, #667eea, #764ba2); border-radius:16px 16px 0 0; padding:32px 32px 28px;">
+                            <p style="margin:0; font-size:26px; font-weight:800; color:#ffffff; letter-spacing:0.5px;">JERSdev</p>
+                            <p style="margin:8px 0 0; font-size:15px; color:#e2e8f0;">&#9993;&nbsp; Nuevo mensaje desde el portfolio</p>
+                        </td>
+                    </tr>
+                    <!-- Cuerpo -->
+                    <tr>
+                        <td bgcolor="#0a0e27" style="background-color:#0a0e27; padding:32px; border-left:1px solid #1e2547; border-right:1px solid #1e2547;">
+                            <p style="margin:0 0 6px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:#94a3b8;">Asunto</p>
+                            <p style="margin:0 0 28px; font-size:22px; font-weight:700; line-height:1.3; color:#e2e8f0;">{{ mensaje.subject }}</p>
+                            <!-- Datos del visitante -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                                <tr>
+                                    <td width="50%" valign="top" style="padding:0 8px 0 0;">
+                                        <p style="margin:0 0 6px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:#94a3b8;">Nombre</p>
+                                        <p style="margin:0; font-size:16px; color:#e2e8f0;">{{ mensaje.name }}</p>
+                                    </td>
+                                    <td width="50%" valign="top" style="padding:0 0 0 8px;">
+                                        <p style="margin:0 0 6px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:#94a3b8;">Email</p>
+                                        <p style="margin:0; font-size:16px; word-break:break-all;"><a href="mailto:{{ mensaje.email }}" style="color:#667eea; text-decoration:none;">{{ mensaje.email }}</a></p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Mensaje -->
+                            <p style="margin:0 0 10px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:#94a3b8;">Mensaje</p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td bgcolor="#11152f" style="background-color:#11152f; border-left:4px solid #667eea; border-radius:8px; padding:20px 22px; font-size:16px; line-height:1.6; color:#e2e8f0;">{{ mensaje.message|linebreaksbr }}</td>
+                                </tr>
+                            </table>
+                            <!-- Botones -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:32px auto 0;">
+                                <tr>
+                                    <td align="center" bgcolor="#667eea" style="background-color:#667eea; background-image:linear-gradient(135deg, #667eea, #764ba2); border-radius:50px;">
+                                        <a href="mailto:{{ mensaje.email }}?subject={{ asuntorespuesta|urlencode }}" style="display:inline-block; padding:14px 32px; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none;">&#8617;&nbsp; Responder a {{ mensaje.name }}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% if urladmin %}
+                            <p style="margin:16px 0 0; text-align:center; font-size:13px;"><a href="{{ urladmin }}" style="color:#94a3b8; text-decoration:underline;">Ver en el admin</a></p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td bgcolor="#0a0e27" style="background-color:#0a0e27; border-top:1px solid #1e2547; border-left:1px solid #1e2547; border-right:1px solid #1e2547; border-bottom:1px solid #1e2547; border-radius:0 0 16px 16px; padding:20px 32px; text-align:center; font-size:12px; line-height:1.6; color:#94a3b8;">
+                            Recibido el {{ mensaje.created_at|date:"d/m/Y \a \l\a\s H:i" }} &middot; <a href="https://jersdev.com" style="color:#667eea; text-decoration:none;">jersdev.com</a><br>
+                            Si respondés este email, le llega directo a {{ mensaje.name }}.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

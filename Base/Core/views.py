@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from .forms import ContactMessageForm
-from .models import AboutMeContent, AboutMeStat, AboutMeImage, Project, ProjectCategory, ProjectImage, Skill, ExperienceCategory, Experience, ExperienceMedia, ExperienceHighlightMedia
+from .models import AboutMeContent, AboutMeStat, AboutMeImage, Project, ProjectCategory, ProjectImage, Skill, SkillCategory, ExperienceCategory, Experience, ExperienceMedia, ExperienceHighlightMedia
 from .tasks import enviarEmailContacto
 
 logger = logging.getLogger(__name__)
@@ -38,18 +38,19 @@ def superoLimite(clave, limite, segundos):
         return False
 
 def home(request):
-    aboutmecontent = AboutMeContent.load()
+    aboutmecontents = AboutMeContent.objects.all()
     aboutmestats = AboutMeStat.objects.all()
     aboutmeimages = AboutMeImage.objects.all()
     projectimages = ProjectImage.objects.exclude(file__isnull=True).exclude(file='') # Una fila sin archivo no se muestra (si no, media.file.url tira 500)
     projects = Project.objects.select_related('category').prefetch_related(Prefetch('images', queryset=projectimages), 'tags', 'links')
     projectcategories = ProjectCategory.objects.all()
     skills = Skill.objects.select_related('level')
+    skillcategories = SkillCategory.objects.prefetch_related(Prefetch('skills', queryset=skills))
     experiencemedia = ExperienceMedia.objects.exclude((Q(file__isnull=True) | Q(file='')) & Q(url='')) # Una fila sin archivo ni URL no se muestra (si no, media.file.url tira 500)
     highlightmedia = ExperienceHighlightMedia.objects.exclude((Q(image__isnull=True) | Q(image='')) & Q(url='')) # Igual que experiencemedia: sin imagen ni URL no se muestra
     experiences = Experience.objects.prefetch_related('metrics', Prefetch('highlights__media', queryset=highlightmedia), 'skills', 'links', Prefetch('media', queryset=experiencemedia))
     experiencecategories = ExperienceCategory.objects.prefetch_related(Prefetch('experiences', queryset=experiences))
-    return render(request, "base.html", {'aboutmecontent': aboutmecontent, 'aboutmestats': aboutmestats, 'aboutmeimages': aboutmeimages, 'projects': projects, 'projectcategories': projectcategories, 'skills': skills, 'experiencecategories': experiencecategories, 'contacttoken': crearTokenContacto()})
+    return render(request, "base.html", {'aboutmecontents': aboutmecontents, 'aboutmestats': aboutmestats, 'aboutmeimages': aboutmeimages, 'projects': projects, 'projectcategories': projectcategories, 'skillcategories': skillcategories, 'experiencecategories': experiencecategories, 'contacttoken': crearTokenContacto()})
 
 @require_POST
 def contact(request):

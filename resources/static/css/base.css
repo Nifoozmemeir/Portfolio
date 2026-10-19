@@ -558,18 +558,59 @@ body {
 /* ===========================================
    SKILLS SECTION
    =========================================== */
-.skills-grid {
+/* Un bloque por SkillCategory (Backend, Frontend...), cada uno con sus skills adentro */
+.skills-groups {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
     gap: 30px;
     margin-top: 50px;
 }
-.skill-card {
+.skill-group {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 30px;
+    transition: border-color 0.3s ease;
+}
+.skill-group:hover {
+    border-color: rgba(102, 126, 234, 0.4);
+}
+.skill-group-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.skill-group-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: white;
+}
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+}
+.skill-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    padding: 20px 12px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     transition: all 0.3s ease;
 }
 .skill-card:hover {
@@ -578,37 +619,28 @@ body {
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
 }
 .skill-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
+    font-size: 2.2rem;
+    margin-bottom: 12px;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: white;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 .skill-name {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 10px;
 }
+/* El SkillLevel como etiqueta */
 .skill-level {
-    color: var(--muted-text);
-    margin-bottom: 15px;
-}
-.skill-progress {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-    overflow: hidden;
-}
-.skill-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    border-radius: 3px;
-    transition: width 1s ease;
+    margin-top: auto;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--light-text);
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.35);
 }
 /* ===========================================
    EXPERIENCE SECTION
@@ -1125,6 +1157,7 @@ body {
     transition: all 0.3s ease;
 }
 .form-control:focus {
+    color: var(--light-text); /* Bootstrap pone el texto oscuro en :focus, acá lo mantenemos claro */
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--primary-color);
     outline: none;
@@ -1136,6 +1169,60 @@ body {
 textarea.form-control {
     min-height: 150px;
     resize: vertical;
+}
+/* SweetAlert del form de contacto, con los colores del sitio */
+.swal2-popup.contact-swal {
+    background: var(--dark-bg);
+    color: var(--light-text);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+}
+.contact-swal .swal2-title {
+    color: var(--light-text);
+    font-family: 'Space Grotesk', sans-serif;
+}
+.contact-swal .swal2-html-container {
+    color: var(--muted-text);
+}
+.contact-swal .swal2-icon.swal2-success {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+.contact-swal .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: var(--success-color);
+}
+.contact-swal .swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+.contact-swal .swal2-icon.swal2-success [class^='swal2-success-circular-line'],
+.contact-swal .swal2-icon.swal2-success .swal2-success-fix {
+    background-color: var(--dark-bg); /* Tapan la animación del tilde, tienen que ser del color del popup */
+}
+.contact-swal .swal2-actions {
+    gap: 12px;
+}
+.contact-swal-btn {
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: 600;
+    color: var(--light-text);
+    transition: all 0.3s ease;
+}
+.contact-swal-btn-listo {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.contact-swal-btn-listo:hover {
+    border-color: var(--light-text);
+}
+.contact-swal-btn-otro {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+.contact-swal-btn-otro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
 }
 /* ===========================================
    FOOTER
@@ -1217,6 +1304,39 @@ textarea.form-control {
 }
 #carouselAbout .carousel-indicators button.active {
     background: var(--primary-color);
+}
+/* Carrusel de texto de About Me: todas las slides en la misma celda, así el alto es el de la más larga y los stats no saltan */
+.about-text-carousel .carousel-inner {
+    display: grid;
+}
+.about-text-carousel .carousel-item {
+    display: block;
+    grid-area: 1 / 1;
+    margin-right: 0;
+}
+.about-text-carousel .carousel-item:not(.active) {
+    pointer-events: none;
+}
+/* Los indicadores van abajo del texto (no encima como en el de fotos), como pastillas */
+.about-text-carousel .carousel-indicators {
+    position: static;
+    justify-content: flex-start;
+    margin: 20px 0 0;
+    gap: 8px;
+}
+.about-text-carousel .carousel-indicators button {
+    width: 10px;
+    height: 10px;
+    margin: 0;
+    border: none;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.25);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+.about-text-carousel .carousel-indicators button.active {
+    width: 30px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
 }
 /* ===========================================
    LOADER

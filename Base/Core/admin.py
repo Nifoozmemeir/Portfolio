@@ -4,14 +4,10 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from .models import *
 
 class AboutMeContentAdmin(TabbedTranslationAdmin):
-    list_display = ('header', 'id')
-    search_fields = ('header',)
+    list_display = ('header', 'id', 'order')
+    search_fields = ('header', 'paragraph')
     readonly_fields = ('created_at', 'updated_at')
-
-    def has_add_permission(self, request):
-        return not AboutMeContent.objects.exists()
-    def has_delete_permission(self, request, obj=None):
-        return False
+    ordering = ('order',)
 
 class AboutMeStatAdmin(TabbedTranslationAdmin):
     list_display = ('value', 'label', 'id', 'order')
@@ -73,11 +69,17 @@ class SkillLevelAdmin(TabbedTranslationAdmin):
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
+class SkillCategoryAdmin(TabbedTranslationAdmin):
+    list_display = ('name', 'id', 'icon', 'order')
+    search_fields = ('name',)
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('order',)
+
 class SkillAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id', 'level', 'percentage', 'order')
-    list_filter = (('level', RelatedDropdownFilter),)
-    list_select_related = ('level',)
-    raw_id_fields = ('level',)
+    list_display = ('name', 'id', 'category', 'level', 'order')
+    list_filter = (('category', RelatedDropdownFilter), ('level', RelatedDropdownFilter))
+    list_select_related = ('category', 'level')
+    raw_id_fields = ('category', 'level')
     search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
@@ -170,6 +172,7 @@ admin.site.register(ProjectImage, ProjectImageAdmin)
 admin.site.register(ProjectTag, ProjectTagAdmin)
 admin.site.register(ProjectLink, ProjectLinkAdmin)
 admin.site.register(SkillLevel, SkillLevelAdmin)
+admin.site.register(SkillCategory, SkillCategoryAdmin)
 admin.site.register(Skill, SkillAdmin)
 admin.site.register(ExperienceCategory, ExperienceCategoryAdmin)
 admin.site.register(Experience, ExperienceAdmin)

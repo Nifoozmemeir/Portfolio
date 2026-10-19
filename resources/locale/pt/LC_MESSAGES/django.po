@@ -64,6 +64,9 @@ msgstr "Entusiasta de Python"
 msgid "Solucionador de problemas"
 msgstr "Solucionador de problemas"
 
+msgid "Ver experiencia"
+msgstr "Ver experiência"
+
 msgid "Ver proyectos"
 msgstr "Ver projetos"
 
@@ -121,8 +124,20 @@ msgstr "Vamos conversar"
 msgid "¿Tenés un proyecto en mente? Trabajemos juntos para hacer realidad tus ideas"
 msgstr "Tem um projeto em mente? Vamos trabalhar juntos para tornar suas ideias realidade"
 
-msgid "¡Mensaje enviado con éxito!"
-msgstr "Mensagem enviada com sucesso!"
+msgid "¡Mensaje enviado!"
+msgstr "Mensagem enviada!"
+
+msgid "Gracias por escribirme, ya lo tengo en mi bandeja. Te respondo lo antes posible."
+msgstr "Obrigado por me escrever; já recebi a sua mensagem. Responderei o mais rapidamente possível."
+
+msgid "Listo"
+msgstr "Pronto"
+
+msgid "Enviar otro email"
+msgstr "Enviar outro e-mail"
+
+msgid "Ups..."
+msgstr "Opa..."
 
 msgid "No se pudo enviar el mensaje, probá de nuevo en un rato."
 msgstr "Não foi possível enviar a mensagem; tente novamente daqui a algum tempo."

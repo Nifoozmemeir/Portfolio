@@ -6,7 +6,7 @@ El español se carga a mano en el admin; el inglés y el portugués los completa
 No se registran los nombres de tecnologías (ProjectTag, Skill): se ven igual en todos los idiomas y traducirlos solo gastaría cupo.
 """
 from modeltranslation.translator import translator, TranslationOptions
-from .models import AboutMeContent, AboutMeStat, AboutMeImage, ProjectCategory, Project, ProjectImage, ProjectLink, SkillLevel, ExperienceCategory, Experience, ExperienceMetric, ExperienceHighlight, ExperienceHighlightMedia, ExperienceSkill, ExperienceLink, ExperienceMedia
+from .models import AboutMeContent, AboutMeStat, AboutMeImage, ProjectCategory, Project, ProjectImage, ProjectLink, SkillLevel, SkillCategory, ExperienceCategory, Experience, ExperienceMetric, ExperienceHighlight, ExperienceHighlightMedia, ExperienceSkill, ExperienceLink, ExperienceMedia
 
 class AboutMeContentTranslation(TranslationOptions):
     fields = ('header', 'paragraph')
@@ -30,6 +30,9 @@ class ProjectLinkTranslation(TranslationOptions):
     fields = ('label',)
 
 class SkillLevelTranslation(TranslationOptions):
+    fields = ('name',)
+
+class SkillCategoryTranslation(TranslationOptions):
     fields = ('name',)
 
 class ExperienceCategoryTranslation(TranslationOptions):
@@ -64,6 +67,7 @@ translator.register(Project, ProjectTranslation)
 translator.register(ProjectImage, ProjectImageTranslation)
 translator.register(ProjectLink, ProjectLinkTranslation)
 translator.register(SkillLevel, SkillLevelTranslation)
+translator.register(SkillCategory, SkillCategoryTranslation)
 translator.register(ExperienceCategory, ExperienceCategoryTranslation)
 translator.register(Experience, ExperienceTranslation)
 translator.register(ExperienceMetric, ExperienceMetricTranslation)
