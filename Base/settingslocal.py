@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 RESOURCES_DIR = os.path.join(BASE_DIR, 'resources')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r%+gt7d^8wj8^@j2cb2x!tvnwm8(i@mxoa3!#85+n=rpo@hk*0'
+SECRET_KEY = config('SECRET_KEY_LOCAL')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

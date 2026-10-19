@@ -1,41 +1,86 @@
-# Portfolio - Instalación
-Python 3.12.4 y Django 5.1
+<div align="center">
 
-- Clonar el repo
+# JERSdev · Portfolio
+
+**Portfolio personal, Full Stack Developer (Python · Django) y Game Developer (Unity · C#).**
+
+Experiencia, proyectos, habilidades y contacto en una sola página, en español, inglés y portugués.
+
+[![Sitio](https://img.shields.io/badge/jersdev.com-online-667eea?style=for-the-badge&logo=googlechrome&logoColor=white)](https://jersdev.com)
+
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-092E20?style=flat-square&logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat-square&logo=amazonwebservices&logoColor=white)
+
+</div>
+
+---
+
+## 🛠️ Instalación local
+
+> Todos los comandos van en **Git Bash**, salvo el de Redis, que va en **Ubuntu de WSL**.
+
+**Requisitos:** Python 3.12, PostgreSQL y WSL con Ubuntu.
+
+**1. Clonar el repo**
 ```sh
 git clone https://github.com/Nifoozmemeir/Portfolio.git
+cd Portfolio
 ```
-- Crear el entorno virtual ![windows-11-icon-logo-6C39629E45-seeklogo comasdasd](https://github.com/user-attachments/assets/3439ac37-728a-48fa-8d6f-8057f07e79fa)
-```sh 
+
+**2. Crear y activar el entorno virtual**
+```sh
 py -m venv myvenv
-```
-- Crear el entorno virtual ![linux-tux-logo-png-transparent-svg-vector-bie-supply-14aa](https://github.com/user-attachments/assets/bbc3c437-0056-4892-9986-ef2832156535)
-```sh 
-python -m venv myvenv
-```
-- Iniciar el entorno virtual ![windows-11-icon-logo-6C39629E45-seeklogo comasdasd](https://github.com/user-attachments/assets/3439ac37-728a-48fa-8d6f-8057f07e79fa)
-```sh
-.\myvenv/Scripts/activate
-```
-- Iniciar el entorno virtual ![linux-tux-logo-png-transparent-svg-vector-bie-supply-14aa](https://github.com/user-attachments/assets/bbc3c437-0056-4892-9986-ef2832156535)
-```sh
 source myvenv/Scripts/activate
 ```
-- Actualizar pip
+
+**3. Instalar las dependencias**
 ```sh
 python -m pip install --upgrade pip
-```
-- Descargar dependencias
-```sh
 pip install -r requirements.txt
 ```
-- Levantar el server ![windows-11-icon-logo-6C39629E45-seeklogo comasdasd](https://github.com/user-attachments/assets/3439ac37-728a-48fa-8d6f-8057f07e79fa)
+
+**4. Configurar las variables de entorno**
+```sh
+cp .env.example .env
+```
+Y completar el `.env` con tus datos.
+
+**5. Levantar Redis** (en Ubuntu de WSL)
+```sh
+sudo apt install redis-server
+redis-cli ping   # tiene que responder PONG
+```
+
+**6. Crear las tablas y un usuario para el admin**
+```sh
+py manage.py migrate
+py manage.py createsuperuser
+```
+
+**7. Compilar las traducciones**
+```sh
+wsl msgfmt -o resources/locale/en/LC_MESSAGES/django.mo resources/locale/en/LC_MESSAGES/django.po
+wsl msgfmt -o resources/locale/pt/LC_MESSAGES/django.mo resources/locale/pt/LC_MESSAGES/django.po
+```
+
+**8. Levantar el server** 🎉
 ```sh
 py manage.py runserver
 ```
-- Levantar el server ![linux-tux-logo-png-transparent-svg-vector-bie-supply-14aa](https://github.com/user-attachments/assets/bbc3c437-0056-4892-9986-ef2832156535)
+Entrá a http://127.0.0.1:8000 y cargá el contenido desde el admin.
+
+**Tests**
 ```sh
-python manage.py runserver
+py manage.py test
 ```
 
-- ENJOY!
+---
+
+<div align="center">
+
+Hecho con ☕ y 🐍 por **Julián Rosas Sandillú** · [jersdev.com](https://jersdev.com) · [LinkedIn](https://linkedin.com/in/julian-ers/) · [GitHub](https://github.com/Nifoozmemeir)
+
+</div>

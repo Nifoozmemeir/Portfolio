@@ -60,6 +60,7 @@ Siempre y en todo el código propio:
         file = models.FileField(..., validators=[FileExtensionValidator(MEDIA_EXTENSIONS)])
     ```
   - Si una constante de un model pasa a usarse en otro, se sube al módulo en ese mismo cambio.
+- **Toda `ForeignKey` (y `OneToOneField`) va con `on_delete=models.PROTECT`.** Nunca `CASCADE`: borrar un registro no puede llevarse puesto en silencio todo lo que cuelga de él; para borrar un padre primero se borran (o reasignan) sus hijos. Solo se usa otra opción (`CASCADE`, `SET_NULL`) en un caso excepcional, consultado con el usuario y con el motivo comentado en la misma línea del campo.
 
 ### `admin.py`
 
@@ -111,6 +112,7 @@ Siempre y en todo el código propio:
 ### `.env` con todo lo sensible
 
 - Todo lo que no tiene que ser visible (`SECRET_KEY`, credenciales de DB, keys de AWS, hosts, debug, etc.) va en `.env` y se lee con `config()` de `python-decouple`. Nada sensible hardcodeado en el código.
+- **NUNCA una key, contraseña, token o credencial escrita en un archivo que se commitee**, aunque sea de desarrollo, de prueba o "de mentira" (incluye la `SECRET_KEY` de `settingslocal.py` y el CI: la del CI se genera al azar en cada run). Si hace falta una, va al `.env` con su nombre en `.env.example`. Si una ya se subió, se considera pública: se genera una nueva, no alcanza con sacarla.
 - El `.env` nunca se commitea.
 
 ### `.gitignore` completo

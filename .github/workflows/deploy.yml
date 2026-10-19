@@ -15,6 +15,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Permisos mínimos: el token de Actions solo puede leer el repo (no pushear, ni tocar releases, issues o PRs)
+permissions:
+  contents: read
+
 # Si pusheás dos veces seguidas, no corren dos deploys a la vez
 concurrency:
   group: deploy-produccion
@@ -54,7 +58,7 @@ jobs:
     # ese es el aviso de que también falta en el .env del server.
     env:
       DJANGO_SETTINGS_MODULE: Base.settingsproduction
-      SECRET_KEY_PROD: ci-clave-larga-de-prueba-solo-para-github-actions-no-es-secreta-123456
+      # SECRET_KEY_PROD no va acá: se genera al azar en cada run (paso "Generar SECRET_KEY"), así no hay ninguna key escrita en el repo
       LIGHTSAIL_IP: 127.0.0.1
       DB_NAME_PROD: portfolio_ci
       DB_USER_PROD: ci
@@ -79,6 +83,9 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+
+      - name: Generar SECRET_KEY al azar para este run
+        run: echo "SECRET_KEY_PROD=$(python -c 'import secrets; print(secrets.token_urlsafe(50))')" >> "$GITHUB_ENV"
 
       - name: Instalar dependencias del sistema (libpq-dev para psycopg2, gettext para compilar las traducciones)
         run: sudo apt-get update -q && sudo apt-get install -y -q libpq-dev gettext

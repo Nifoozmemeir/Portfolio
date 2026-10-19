@@ -95,7 +95,7 @@ class Project(models.Model):
         return f"{self.title}"
 
 class ProjectImage(models.Model):
-    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.CASCADE, related_name='images')
+    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.PROTECT, related_name='images')
     file = models.FileField("File (jpg, png, webp, gif, mp4)", upload_to='Projects/', null=True, blank=False, validators=[FileExtensionValidator(MEDIA_EXTENSIONS)]) # Imagen, GIF o video MP4.
     description = models.CharField("Description", max_length=100, null=False, blank=False)
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
@@ -116,7 +116,7 @@ class ProjectImage(models.Model):
         return self.file.name.lower().rsplit('.', 1)[-1] in VIDEO_EXTENSIONS
 
 class ProjectTag(models.Model):
-    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.CASCADE, related_name='tags')
+    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.PROTECT, related_name='tags')
     name = models.CharField("Name", max_length=30, null=False, blank=False)
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
 
@@ -132,7 +132,7 @@ class ProjectTag(models.Model):
         return f"{self.project.title} - {self.name}"
 
 class ProjectLink(models.Model):
-    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.CASCADE, related_name='links')
+    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.PROTECT, related_name='links')
     label = models.CharField("Label", max_length=30, null=False, blank=False)
     url = models.URLField("URL", max_length=300, null=False, blank=False)
     icon = models.CharField("Icon (ej: fa-brands fa-github)", max_length=50, null=False, blank=False, default='fa-solid fa-link')
@@ -243,7 +243,7 @@ class Experience(models.Model):
         return f"{self.role} - {self.organization}"
 
 class ExperienceMetric(models.Model):
-    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='metrics')
+    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.PROTECT, related_name='metrics')
     value = models.CharField("Value (ej: 12+)", max_length=10, null=False, blank=False)
     label = models.CharField("Label", max_length=60, null=False, blank=False)
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
@@ -260,7 +260,7 @@ class ExperienceMetric(models.Model):
         return f"{self.experience.role} - {self.value} {self.label}"
 
 class ExperienceHighlight(models.Model):
-    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='highlights')
+    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.PROTECT, related_name='highlights')
     title = models.CharField("Title", max_length=100, null=False, blank=True) # También es el título del modal de imágenes
     description = models.TextField("Description", null=False, blank=False)
     icon = models.CharField("Icon (ej: fa-solid fa-envelope)", max_length=50, null=False, blank=False, default='fa-solid fa-check')
@@ -289,7 +289,7 @@ class ExperienceHighlight(models.Model):
 class ExperienceHighlightMedia(models.Model):
     DEFAULT_URL_ICON = 'fa-solid fa-arrow-up-right-from-square' # El que se pone si cargás una URL sin icon
 
-    highlight = models.ForeignKey(ExperienceHighlight, verbose_name="Highlight", on_delete=models.CASCADE, related_name='media')
+    highlight = models.ForeignKey(ExperienceHighlight, verbose_name="Highlight", on_delete=models.PROTECT, related_name='media')
     image = models.ImageField("Image", upload_to='Experience/Highlights/', null=True, blank=True) # Todas las imágenes del highlight se ven juntas en un modal con carrusel. Va image o url, no los dos
     url = models.URLField("URL (video, demo, repo, etc.)", max_length=300, null=False, blank=True) # Se muestra como botón chico que abre el link en otra pestaña
     label = models.CharField("Label (texto del botón o descripción de la imagen)", max_length=60, null=False, blank=False)
@@ -319,7 +319,7 @@ class ExperienceHighlightMedia(models.Model):
         super().save(*args, **kwargs)
 
 class ExperienceSkill(models.Model):
-    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='skills')
+    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.PROTECT, related_name='skills')
     name = models.CharField("Name", max_length=50, null=False, blank=False)
     issoftskill = models.BooleanField("Is soft skill", null=False, blank=False, default=False) # Se muestra como tag verde
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
@@ -341,7 +341,7 @@ class ExperienceSkill(models.Model):
         return self.issoftskill
 
 class ExperienceLink(models.Model):
-    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='links')
+    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.PROTECT, related_name='links')
     label = models.CharField("Label", max_length=40, null=False, blank=False)
     url = models.URLField("URL", max_length=300, null=False, blank=False)
     icon = models.CharField("Icon (ej: fa-solid fa-award)", max_length=50, null=False, blank=False, default='fa-solid fa-arrow-right')
@@ -361,7 +361,7 @@ class ExperienceLink(models.Model):
 class ExperienceMedia(models.Model):
     YOUTUBE_PATTERN = r'(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/|live/)|youtu\.be/)([\w-]{11})' # Saca el id del video de cualquier formato de link de YouTube
 
-    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.CASCADE, related_name='media')
+    experience = models.ForeignKey(Experience, verbose_name="Experience", on_delete=models.PROTECT, related_name='media')
     file = models.FileField("File (jpg, png, webp, gif, mp4)", upload_to='Experience/', null=True, blank=True, validators=[FileExtensionValidator(MEDIA_EXTENSIONS)]) # Imagen, GIF o video MP4. Va file o url, no los dos
     url = models.URLField("URL (YouTube o link externo)", max_length=300, null=False, blank=True) # Si es de YouTube se embebe el video, si no se muestra como card con link
     title = models.CharField("Title", max_length=100, null=False, blank=False)
