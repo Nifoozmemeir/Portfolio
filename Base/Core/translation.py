@@ -36,7 +36,7 @@ class SkillCategoryTranslation(TranslationOptions):
     fields = ('name',)
 
 class ExperienceCategoryTranslation(TranslationOptions):
-    fields = ('name',)
+    fields = ('name', 'currentlabel', 'remotelabel')
 
 class ExperienceTranslation(TranslationOptions):
     fields = ('role', 'location', 'summary')

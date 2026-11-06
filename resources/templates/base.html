@@ -247,11 +247,12 @@
                                             <p class="experience-meta">
                                                 <span class="experience-organization">{{ experience.organization }}</span>
                                                 {% if experience.location %}<span class="experience-location"><i class="fa-solid fa-location-dot"></i> {{ experience.location }}</span>{% endif %}
+                                                {% if experience.isremote and category.remotelabel %}<span class="experience-location"><i class="fa-solid fa-laptop"></i> {{ category.remotelabel }}</span>{% endif %}
                                             </p>
                                         </div>
                                         <div class="experience-dates-block">
                                             <span class="experience-dates-chip"><i class="fa-solid fa-calendar"></i> {{ experience.startdate|date:"d/m/Y" }} — {% if experience.enddate %}{{ experience.enddate|date:"d/m/Y" }}{% else %}{% translate 'Presente' %}{% endif %}</span>
-                                            {% if not experience.enddate %}<span class="experience-current"><span class="experience-current-dot"></span>{% translate 'Puesto actual' %}</span>{% endif %}
+                                            {% if not experience.enddate and category.currentlabel %}<span class="experience-current"><span class="experience-current-dot"></span>{{ category.currentlabel }}</span>{% endif %}
                                         </div>
                                     </header>
                                     {% if experience.summary %}<p class="experience-summary">{{ experience.summary }}</p>{% endif %}

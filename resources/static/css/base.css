@@ -1397,6 +1397,12 @@ textarea.form-control {
     z-index: 9999;
     transform: translate(-50%, -70%);
 }
+@media (hover: none), (pointer: coarse) { /* Celular/tablet: no hay mouse, el cursor custom quedaría flotando donde se tocó */
+    .cursor,
+    .cursor-follower {
+        display: none;
+    }
+}
 /* ===========================================
    PARALLAX EFFECT
    =========================================== */

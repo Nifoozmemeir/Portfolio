@@ -202,6 +202,8 @@ class ExperienceCategory(models.Model):
     name = models.CharField("Name", max_length=50, null=False, blank=False) # Lo que se ve en el tab, ej: Work
     slug = models.SlugField("Slug", max_length=50, unique=True, null=False, blank=True) # Identificador interno del tab (el data-target del front).
     icon = models.CharField("Icon (ej: fa-solid fa-briefcase)", max_length=50, null=False, blank=False, default='fa-solid fa-briefcase') # Va en el tab y en el círculo del timeline
+    currentlabel = models.CharField("Current label (ej: Puesto actual, En curso)", max_length=50, null=False, blank=True) # Badge verde de las experiencias de esta categoría sin end date; vacío = no hay badge
+    remotelabel = models.CharField("Remote label (ej: Remoto, Virtual)", max_length=50, null=False, blank=True) # Lo que se ve, con ícono de laptop, en las experiencias de esta categoría marcadas como remotas
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -222,12 +224,13 @@ class ExperienceCategory(models.Model):
 
 class Experience(models.Model):
     category = models.ForeignKey(ExperienceCategory, verbose_name="Category", on_delete=models.PROTECT, related_name='experiences')
-    role = models.CharField("Role", max_length=100, null=False, blank=False)
-    organization = models.CharField("Organization", max_length=100, null=False, blank=False)
+    role = models.CharField("Role / Carrera o curso", max_length=100, null=False, blank=False)
+    organization = models.CharField("Organization / Institución", max_length=100, null=False, blank=False)
     logo = models.ImageField("Logo", upload_to='Experience/', null=True, blank=True) # Si está vacío no se muestra
-    location = models.CharField("Location", max_length=100, null=False, blank=True)
+    location = models.CharField("Location (opcional, vacío si fue 100% remoto/virtual)", max_length=100, null=False, blank=True) # Si está vacío no se muestra
+    isremote = models.BooleanField("Remoto / Virtual", null=False, blank=False, default=False) # Muestra el remote label de la categoría (ej: Remoto, Virtual); se puede combinar con location si fue híbrido
     startdate = models.DateField("Start date", null=False, blank=False)
-    enddate = models.DateField("End date (vacío = Present)", null=True, blank=True) # Vacío muestra "Present" y el badge "Current role"
+    enddate = models.DateField("End date (vacío = Presente)", null=True, blank=True) # Vacío muestra "Presente" y el current label de la categoría (ej: Puesto actual, En curso)
     summary = models.TextField("Summary", null=False, blank=True)
     order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
 

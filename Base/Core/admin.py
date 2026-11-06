@@ -85,14 +85,14 @@ class SkillAdmin(admin.ModelAdmin):
     ordering = ('order',)
 
 class ExperienceCategoryAdmin(TabbedTranslationAdmin):
-    list_display = ('name', 'id', 'slug', 'icon', 'order')
+    list_display = ('name', 'id', 'slug', 'icon', 'currentlabel', 'remotelabel', 'order')
     search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('order',)
 
 class ExperienceAdmin(TabbedTranslationAdmin):
-    list_display = ('role', 'id', 'organization', 'category', 'startdate', 'enddate', 'order')
-    list_filter = (('category', RelatedDropdownFilter),)
+    list_display = ('role', 'id', 'organization', 'category', 'isremote', 'startdate', 'enddate', 'order')
+    list_filter = (('category', RelatedDropdownFilter), ('isremote', DropdownFilter))
     list_select_related = ('category',)
     raw_id_fields = ('category',)
     search_fields = ('role', 'organization', 'summary')

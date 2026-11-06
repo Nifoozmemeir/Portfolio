@@ -255,7 +255,7 @@ document.getElementById('contactForm')?.addEventListener('submit', async functio
 // Cursor custom
 const cursor = document.getElementById('cursor');
 const cursorFollower = document.getElementById('cursor-follower');
-if (cursor && cursorFollower) {
+if (cursor && cursorFollower && window.matchMedia('(hover: hover) and (pointer: fine)').matches) { // Solo con mouse (en celular el CSS lo oculta)
     document.addEventListener('mousemove', (e) => {
         cursor.style.left = e.clientX + 'px';
         cursor.style.top = e.clientY + 'px';

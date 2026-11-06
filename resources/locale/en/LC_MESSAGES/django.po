@@ -91,9 +91,6 @@ msgstr "Where I've worked and where I've learned"
 msgid "Presente"
 msgstr "Present"
 
-msgid "Puesto actual"
-msgstr "Current role"
-
 msgid "Lo que construí"
 msgstr "What I built"
 
