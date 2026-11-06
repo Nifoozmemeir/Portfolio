@@ -116,9 +116,9 @@ class ProjectImage(models.Model):
         return self.file.name.lower().rsplit('.', 1)[-1] in VIDEO_EXTENSIONS
 
 class ProjectTag(models.Model):
-    project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.PROTECT, related_name='tags')
-    name = models.CharField("Name", max_length=30, null=False, blank=False)
-    order = models.PositiveIntegerField("Order", null=False, blank=False, default=0)
+    projects = models.ManyToManyField(Project, verbose_name="Projects", related_name='tags', blank=True) # Un mismo tag (ej: Django) se reusa en todos los proyectos que lo usan
+    name = models.CharField("Name", max_length=30, unique=True, null=False, blank=False) # Único: un tag por tecnología, no uno por proyecto
+    order = models.PositiveIntegerField("Order", null=False, blank=False, default=0) # Orden de los tags dentro de cada proyecto (es el mismo para todos)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -129,7 +129,7 @@ class ProjectTag(models.Model):
         ordering = ('order',)
 
     def __str__(self):
-        return f"{self.project.title} - {self.name}"
+        return f"{self.name}"
 
 class ProjectLink(models.Model):
     project = models.ForeignKey(Project, verbose_name="Project", on_delete=models.PROTECT, related_name='links')

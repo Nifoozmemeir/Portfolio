@@ -46,13 +46,17 @@ class ProjectImageAdmin(TabbedTranslationAdmin):
     ordering = ('project', 'order')
 
 class ProjectTagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id', 'project', 'order')
-    list_filter = (('project', RelatedDropdownFilter),)
-    list_select_related = ('project',)
-    raw_id_fields = ('project',)
-    search_fields = ('name', 'project__title')
+    list_display = ('name', 'id', 'verProjects', 'order')
+    list_filter = (('projects', RelatedDropdownFilter),)
+    filter_horizontal = ('projects',)
+    search_fields = ('name', 'projects__title')
     readonly_fields = ('created_at', 'updated_at')
-    ordering = ('project', 'order')
+    ordering = ('order',)
+    def verProjects(self, obj):
+        return ", ".join(p.title for p in obj.projects.all())
+    verProjects.short_description = 'Projects'
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('projects')
 
 class ProjectLinkAdmin(TabbedTranslationAdmin):
     list_display = ('label', 'id', 'project', 'url', 'order')

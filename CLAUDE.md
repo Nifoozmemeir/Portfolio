@@ -236,7 +236,8 @@ Migraciones: solo cuando el usuario lo pide. No hay linter/formatter configurado
 
 - **Singleton para contenido único** (hoy no hay ninguno): `save()` fuerza `pk=1`, expone `load()` (get-or-create); en el admin `has_add_permission` da `False` si ya existe y `has_delete_permission` siempre `False`.
 - **Colección ordenada para listas** (ej. `AboutMeContent`, que son las slides del carrusel de texto de About Me, `AboutMeStat`, `AboutMeImage`): campo `order` (`PositiveIntegerField`) con `ordering = ('order',)`.
-- Los hijos de `Project` (`ProjectImage`, `ProjectTag`, `ProjectLink`) tienen su propio admin, con el proyecto por `raw_id_fields` y filtro dropdown; no son inlines.
+- Los hijos de `Project` (`ProjectImage`, `ProjectLink`) tienen su propio admin, con el proyecto por `raw_id_fields` y filtro dropdown; no son inlines.
+- `ProjectTag` no es hijo de un proyecto: es un M2M (`projects`, `related_name='tags'`) con `name` único, así un mismo tag (ej. Django) se reusa en varios proyectos. Se asignan desde el admin del tag (`filter_horizontal`).
 - Todo el contenido se administra desde `/admin/`; no hay CRUD público. El único form público es el de contacto, y sus mensajes (`ContactMessage`) son de solo lectura en el admin (`has_add_permission` → `False`, todos los campos en `readonly_fields`).
 
 ### Pendientes conocidos
